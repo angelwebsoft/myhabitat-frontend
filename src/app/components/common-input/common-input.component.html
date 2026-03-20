@@ -1,0 +1,11 @@
+<ion-item [lines]="lines" class="mb-1 min-h-[56px] items-center rounded-[18px] bg-[#f1f5f9] pl-4 pr-3">
+    <ion-icon *ngIf="iconName" [name]="iconName" class="mr-4 text-slate-400"></ion-icon>
+    <ion-label *ngIf="label" [position]="position">{{ label }}</ion-label>
+    <ion-input #ionInput class="flex-1" [type]="type" [inputmode]="inputmode" [placeholder]="placeholder"
+        [clearInput]="clearInput" [maxlength]="maxlength!" [disabled]="disabled" [(ngModel)]="value"
+        (ngModelChange)="onModelChange($event)" (ionBlur)="onBlur()">
+    </ion-input>
+</ion-item>
+<div class="px-4 py-1 text-sm text-red-500" *ngIf="errorText">
+    {{ errorText }}
+</div>

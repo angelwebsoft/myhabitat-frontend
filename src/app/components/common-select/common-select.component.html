@@ -1,0 +1,17 @@
+<div class="flex items-center mb-1 min-h-[56px] items-center rounded-[18px] bg-[#f1f5f9] pl-4 pr-3">
+    <ion-icon *ngIf="iconName" [name]="iconName" class="mr-3 text-slate-400 text-xl"></ion-icon>
+    <div class="flex flex-col flex-1">
+        <span *ngIf="label" class="text-[11px] font-medium text-slate-400 mt-1.5">{{ label }}</span>
+        <select
+            class="w-full bg-transparent border-none outline-none focus:outline-none focus:ring-0 py-1.5 -ml-1 text-[15px] font-semibold text-slate-800"
+            [disabled]="disabled" [(ngModel)]="value" (ngModelChange)="onModelChange($event)" (blur)="onBlur()">
+            <option value="" disabled *ngIf="placeholder">{{ placeholder }}</option>
+            <option *ngFor="let opt of options" [ngValue]="opt.value">
+                {{ opt.label }}
+            </option>
+        </select>
+    </div>
+</div>
+<div class="px-4 py-1 text-sm text-red-500" *ngIf="errorText">
+    {{ errorText }}
+</div>

@@ -1,0 +1,171 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS/Sass files to be included in the
+ * output CSS.
+ * For more information on global stylesheets, visit the documentation:
+ * https://ionicframework.com/docs/layout/global-stylesheets
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Core CSS required for Ionic components to work properly */
+@import "@ionic/angular/css/core.css";
+
+/* Tailwind-driven helpers for the login screen */
+.login-shell {
+    @apply min-h-screen bg-slate-950 text-white;
+}
+
+.login-card {
+    @apply rounded-[28px] border border-white/15 bg-white/10 backdrop-blur;
+}
+
+.login-card ion-card-content {
+    @apply space-y-4;
+}
+
+body,
+ion-content,
+ion-label,
+ion-title,
+ion-button {
+    font-family: 'Outfit', sans-serif !important;
+}
+
+ion-menu-button {
+    --padding-start: 0;
+    --padding-end: 0;
+    --padding-top: 0;
+    --padding-bottom: 0;
+    width: 34px;
+    height: 34px;
+    margin: 0;
+}
+
+ion-menu-button::part(native) {
+    width: 34px;
+    height: 34px;
+    background: #fff;
+}
+
+ion-menu-button::part(icon) {
+    font-size: 20px;
+    color: #000;
+}
+
+ion-back-button {
+    --padding-start: 0;
+    --padding-end: 0;
+    --padding-top: 0;
+    --padding-bottom: 0;
+    margin: 0;
+    width: 20px;
+    height: 34px;
+    display: flex;
+}
+
+ion-back-button::part(native) {
+    width: auto;
+    height: auto;
+    min-width: 0;
+    min-height: 0;
+}
+
+ion-back-button::part(icon) {
+    font-size: 20px;
+}
+
+// ion-select {
+//     width: 100%;
+// }
+
+// ion-select::part(container) {
+//     width: 100%;
+//     display: flex;
+//     align-items: center;
+//     justify-content: space-between;
+// }
+
+// ion-select::part(text) {
+//     flex: 1;
+//     min-width: 0;
+// }
+
+ion-button.icon-nav-btn {
+    --padding-start: 0;
+    --padding-end: 0;
+    --padding-top: 0;
+    --padding-bottom: 0;
+    width: 20px;
+    height: 34px;
+    margin: 0;
+}
+
+ion-button.icon-nav-btn::part(native) {
+    width: 20px;
+    height: 34px;
+}
+
+ion-button.icon-nav-btn ion-icon {
+    font-size: 20px;
+}
+
+
+.logout-btn {
+    --border-radius: 999px;
+    --padding-start: 0;
+    --padding-end: 0;
+    height: 34px;
+    margin: 0;
+}
+
+
+
+ion-select::part(text) {
+    // color: red;
+}
+
+ion-select::part(icon) {
+    color: #94a3b8;
+    position: absolute;
+    right: 0;
+}
+
+/* Basic CSS for apps built with Ionic */
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+
+/* Optional CSS utils that can be commented out */
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+
+/**
+ * Ionic Dark Mode
+ * -----------------------------------------------------
+ * For more info, please see:
+ * https://ionicframework.com/docs/theming/dark-mode
+ */
+
+/* @import "@ionic/angular/css/palettes/dark.always.css"; */
+/* @import "@ionic/angular/css/palettes/dark.class.css"; */
+/* @import '@ionic/angular/css/palettes/dark.system.css'; */
+ion-input {
+    --padding-start: 0px !important;
+    pointer-events: auto !important;
+}
+
+/* Ensure the wrapper doesn't block interaction */
+ion-item {
+    --inner-padding-end: 0;
+    --background: transparent;
+}

@@ -1,0 +1,15 @@
+{
+  "/api": {
+    "target": "https://myhabitat-backend.onrender.com",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "warn"
+  },
+  "/socket.io": {
+    "target": "https://myhabitat-backend.onrender.com",
+    "secure": false,
+    "changeOrigin": true,
+    "ws": true,
+    "logLevel": "warn"
+  }
+}

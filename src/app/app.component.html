@@ -1,0 +1,80 @@
+<ion-app>
+  <ion-menu menuId="main-menu" contentId="main-content" type="overlay">
+    <ion-content color="light">
+      <div class="flex min-h-full flex-col">
+        <div class="bg-white px-4 pb-4 pt-4 shadow-[0_6px_18px_rgba(15,23,42,0.06)]"
+          [style.padding-top]="'calc(env(safe-area-inset-top, 0px) + 16px)'">
+          <div class="flex items-center gap-3">
+            <ion-avatar class="relative h-12 w-12 shrink-0">
+              <img *ngIf="(currentUser$ | async)?.photoURL" [src]="(currentUser$ | async)?.photoURL" />
+              <div *ngIf="!(currentUser$ | async)?.photoURL"
+                class="flex h-full w-full items-center justify-center rounded-full bg-slate-100 text-[16px] font-extrabold text-slate-700">
+                {{ (currentUser$ | async)?.userName?.charAt(0) || '?' }}
+              </div>
+              <span
+                class="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-white bg-emerald-500"></span>
+            </ion-avatar>
+            <div class="min-w-0">
+              <div class="truncate text-[16px] font-bold text-slate-900">{{ (currentUser$ | async)?.userName ||
+                'MyHabitat' }}</div>
+              <div class="truncate text-[13px] text-slate-500">{{ (currentUser$ | async)?.role || '' }}</div>
+            </div>
+          </div>
+        </div>
+
+        <ion-list lines="none" class="mt-2 bg-transparent px-2">
+          <ion-menu-toggle autoHide="true">
+            <ion-item button detail="false" class="rounded-xl" (click)="goDashboard()">
+              <ion-icon name="grid-outline" slot="start"></ion-icon>
+              <ion-label>Dashboard</ion-label>
+            </ion-item>
+          </ion-menu-toggle>
+
+          <ng-container *ngIf="(currentUser$ | async)?.role === 'admin'">
+            <ion-menu-toggle autoHide="true">
+              <ion-item button detail="false" class="rounded-xl" (click)="router.navigate(['/admin/users/residents'])">
+                <ion-icon name="people-outline" slot="start"></ion-icon>
+                <ion-label>Manage Residents</ion-label>
+              </ion-item>
+            </ion-menu-toggle>
+            <ion-menu-toggle autoHide="true">
+              <ion-item button detail="false" class="rounded-xl"
+                (click)="router.navigate(['/admin/users/gatekeepers'])">
+                <ion-icon name="shield-checkmark-outline" slot="start"></ion-icon>
+                <ion-label>Manage Gatekeepers</ion-label>
+              </ion-item>
+            </ion-menu-toggle>
+            <ion-menu-toggle autoHide="true">
+              <ion-item button detail="false" class="rounded-xl" (click)="router.navigate(['/admin/users/admins'])">
+                <ion-icon name="person-outline" slot="start"></ion-icon>
+                <ion-label>Manage Admins</ion-label>
+              </ion-item>
+            </ion-menu-toggle>
+          </ng-container>
+        </ion-list>
+
+        <div class="mt-auto p-3">
+          <ion-menu-toggle autoHide="true">
+            <ion-button expand="block" color="danger" class="h-11 font-bold [--border-radius:14px]" (click)="logout()">
+              <ion-icon name="log-out-outline" slot="start"></ion-icon>
+              Logout
+            </ion-button>
+          </ion-menu-toggle>
+        </div>
+      </div>
+    </ion-content>
+  </ion-menu>
+
+  <ng-container *ngIf="isNative; else framedApp">
+    <ion-router-outlet id="main-content" [animated]="false"></ion-router-outlet>
+    <!-- White Safe Area Overlay for Bottom Notch Navigation Cushion Edge -->
+    <div [style.height]="'env(safe-area-inset-bottom, 0px)'" class="fixed bottom-0 z-[999] w-full bg-white"></div>
+  </ng-container>
+  <ng-template #framedApp>
+    <div class="app-viewport">
+      <div class="app-frame">
+        <ion-router-outlet id="main-content" [animated]="false"></ion-router-outlet>
+      </div>
+    </div>
+  </ng-template>
+</ion-app>

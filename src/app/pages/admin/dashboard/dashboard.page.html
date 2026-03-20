@@ -1,0 +1,58 @@
+<app-header [title]="headerTitle" color="dark"></app-header>
+
+<ion-content color="light">
+  <div class="rounded-b-[28px] bg-slate-900 px-4 pb-4 pt-5 text-white shadow-[0_8px_24px_rgba(15,23,42,0.18)]">
+    <p class="m-0 text-[13px] text-slate-300">Administration</p>
+    <h2 class="mt-1 text-[1.55rem] font-bold text-white">Society Overview</h2>
+  </div>
+
+  <div class="px-4 pb-5 pt-4">
+    <div class="space-y-4">
+      <div class="grid grid-cols-1 gap-4">
+        <ion-card color="light" class="m-0 rounded-[18px] shadow-[0_6px_18px_rgba(15,23,42,0.06)]">
+          <ion-card-header>
+            <ion-card-subtitle>Total Visits</ion-card-subtitle>
+            <ion-card-title>{{ totalVisits }}</ion-card-title>
+          </ion-card-header>
+        </ion-card>
+        <ion-card color="light" class="m-0 rounded-[18px] shadow-[0_6px_18px_rgba(15,23,42,0.06)]">
+          <ion-card-header>
+            <ion-card-subtitle>Active Visitors</ion-card-subtitle>
+            <ion-card-title>{{ activeVisitors }}</ion-card-title>
+          </ion-card-header>
+        </ion-card>
+      </div>
+
+      <ion-list class="overflow-hidden rounded-[18px] border border-slate-200 bg-white">
+        <ion-list-header class="border-b border-slate-100 bg-slate-50/80">
+          <ion-label>Quick Actions</ion-label>
+        </ion-list-header>
+        <ion-item button (click)="exportCsv()" class="min-h-14">
+          <ion-icon name="download-outline" slot="start"></ion-icon>
+          <ion-label>Export Visitor Logs (CSV)</ion-label>
+        </ion-item>
+        <ion-item button (click)="manageResidents()" class="min-h-14">
+          <ion-icon name="people-outline" slot="start"></ion-icon>
+          <ion-label>Manage Residents</ion-label>
+        </ion-item>
+        <ion-item button (click)="manageGatekeepers()" class="min-h-14">
+          <ion-icon name="shield-checkmark-outline" slot="start"></ion-icon>
+          <ion-label>Manage Gatekeepers</ion-label>
+        </ion-item>
+        <ion-item button (click)="manageAdmins()" class="min-h-14">
+          <ion-icon name="person-outline" slot="start"></ion-icon>
+          <ion-label>Manage Admins</ion-label>
+        </ion-item>
+      </ion-list>
+
+      <div class="pt-4">
+        <visit-calendar
+          [visitors]="visitors"
+          title="Visits Calendar"
+          subtitle="All society visits (date-wise)"
+          emptyText="No visits found for this date."
+        ></visit-calendar>
+      </div>
+    </div>
+  </div>
+</ion-content>

@@ -1,0 +1,70 @@
+<ion-content fullscreen class="ion-padding login-shell">
+  <div class="mx-auto flex w-full max-w-lg flex-col gap-6 relative">
+
+    <!-- Server Status Indicator -->
+    <div class="absolute -top-10 left-0 right-0 flex justify-center pointer-events-none">
+      <div
+        class="px-4 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-wider backdrop-blur-md shadow-sm transition-all flex items-center gap-2"
+        [ngClass]="{
+             'bg-yellow-100/80 text-yellow-700 border border-yellow-200': serverStatus === 'checking',
+             'bg-emerald-100/80 text-emerald-700 border border-emerald-200': serverStatus === 'online',
+             'bg-rose-100/80 text-rose-700 border border-rose-200': serverStatus === 'offline'
+           }">
+        <span class="relative flex h-2 w-2">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" [ngClass]="{
+                  'bg-yellow-400': serverStatus === 'checking',
+                  'bg-emerald-400': serverStatus === 'online',
+                  'bg-rose-400': serverStatus === 'offline'
+                }"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2" [ngClass]="{
+                  'bg-yellow-500': serverStatus === 'checking',
+                  'bg-emerald-500': serverStatus === 'online',
+                  'bg-rose-500': serverStatus === 'offline'
+                }"></span>
+        </span>
+        <span *ngIf="serverStatus === 'checking'">Checking Server...</span>
+        <span *ngIf="serverStatus === 'online'">Server is Online</span>
+        <span *ngIf="serverStatus === 'offline'">Server Offline</span>
+      </div>
+    </div>
+
+    <header class="space-y-2 text-center mt-6">
+      <h1 class="text-4xl font-black tracking-tight">MyHabitat</h1>
+      <p class="text-sm text-slate-300">
+        Quick OTP access for visitors, gatekeepers, and residents.
+      </p>
+    </header>
+
+    <ion-card class="login-card">
+      <ion-card-content>
+        <app-common-input label="Mobile Number" type="tel" inputmode="numeric" placeholder="70410 66102"
+          [(ngModel)]="mobileNumber" [clearInput]="true">
+        </app-common-input>
+
+
+        <app-common-select lines="none" iconName="people-outline" interface="action-sheet" [options]="[
+            { label: 'Gatekeeper', value: 'gatekeeper' },
+            { label: 'Resident', value: 'resident' },
+            { label: 'Admin', value: 'admin' }
+          ]" [(ngModel)]="role">
+        </app-common-select>
+
+        <app-common-input *ngIf="otpSent" label="OTP" type="tel" inputmode="numeric" [maxlength]="6"
+          placeholder="123456" [(ngModel)]="otp">
+        </app-common-input>
+
+        <ion-button expand="block" class="ion-margin-top" [disabled]="!mobileNumber || isSendingOtp" *ngIf="!otpSent"
+          (click)="onSendOtp()">
+          {{ isSendingOtp ? 'Sending OTP...' : 'Send OTP' }}
+        </ion-button>
+
+        <ion-button expand="block" class="ion-margin-top" [disabled]="otp.length !== 6" *ngIf="otpSent"
+          (click)="onVerifyOtp()">
+          Verify OTP
+        </ion-button>
+
+        <div id="recaptcha-container" class="recaptcha-placeholder"></div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>
