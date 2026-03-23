@@ -1,7 +1,8 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
+
 import { DataService } from '../../../services/data.service';
 import { AuthService } from '../../../services/auth.service';
 import { Visitor } from '../../../models/visitor.model';
@@ -23,6 +24,7 @@ export class AdminDashboardPage implements OnInit {
   private dataService = inject(DataService);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private toastCtrl = inject(ToastController);
 
   ngOnInit() {
     this.authService.currentUser$.subscribe(async user => {
@@ -47,8 +49,16 @@ export class AdminDashboardPage implements OnInit {
     this.router.navigate(['/admin/users/admins']);
   }
 
-  exportCsv() {
-    if (this.visitors.length === 0) return;
+  async exportCsv() {
+    if (this.visitors.length === 0) {
+      const toast = await this.toastCtrl.create({
+        message: 'No visitor data available to export.',
+        duration: 2000,
+        color: 'warning'
+      });
+      await toast.present();
+      return;
+    }
 
     const headers = 'Visitor,Mobile,Flat,Status,Check-In,Check-Out\n';
     const csvContent = this.visitors.map(v =>
@@ -56,6 +66,7 @@ export class AdminDashboardPage implements OnInit {
     ).join('\n');
 
     const blob = new Blob([headers + csvContent], { type: 'text/csv' });
+
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;

@@ -8,63 +8,46 @@ import { Router } from '@angular/router';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import * as QRCode from 'qrcode';
 import { AppHeaderComponent } from '../../../components/app-header/app-header.component';
+import { CommonInputComponent } from '../../../components/common-input/common-input.component';
+import { CommonDateComponent } from '../../../components/common-date/common-date.component';
 
 @Component({
   selector: 'app-pre-approve',
   template: `
     <app-header title="Pre-Approve Guest" color="tertiary" [showBack]="true" defaultHref="/resident"></app-header>
 
-    <ion-content class="ion-padding">
-      <div *ngIf="qrDataUrl" class="mb-5 rounded-2xl bg-white p-4 shadow-[0_6px_18px_rgba(15,23,42,0.06)]">
-        <h2 class="m-0 text-[16px] font-bold text-slate-800">Guest QR</h2>
+    <ion-content class="ion-padding bg-slate-50">
+      <div *ngIf="qrDataUrl" class="mb-5 rounded-[24px] bg-white p-4 shadow-[0_8px_24px_rgba(15,23,42,0.06)] border border-slate-100/80">
+        <h2 class="m-0 text-[16px] font-bold text-slate-800">Guest Pass</h2>
         <p class="mt-1 text-[13px] text-slate-500">Ask the guest to show this QR to the gatekeeper.</p>
 
         <div class="mt-4 flex items-center gap-4">
-          <button type="button" class="shrink-0 rounded-xl border border-slate-200 bg-white p-2" (click)="openQr()">
+          <button type="button" class="shrink-0 rounded-2xl border border-slate-200 bg-white p-2" (click)="openQr()">
             <img [src]="qrDataUrl" alt="Guest QR" class="h-[110px] w-[110px]" />
           </button>
           <div class="min-w-0">
-            <p class="m-0 truncate text-[14px] font-bold text-slate-800">{{ guest.visitorName }}</p>
+            <p class="m-0 truncate text-[15px] font-bold text-slate-800">{{ guest.visitorName }}</p>
             <p class="mt-1 truncate text-[13px] text-slate-500">{{ guest.mobile }}</p>
             <p class="mt-1 truncate text-[13px] text-slate-500">{{ guest.validDate | date:'mediumDate' }}</p>
-            <p class="mt-1 truncate text-[12px] text-slate-400">Token: {{ qrToken }}</p>
-            <ion-button size="small" class="mt-2" color="tertiary" (click)="openQr()">
-              View Large QR
+            <p class="mt-1 truncate text-[11px] text-slate-400">Token: {{ qrToken }}</p>
+            <ion-button size="small" class="mt-2 font-bold" color="tertiary" fill="clear" (click)="openQr()">
+              Enlarge QR
             </ion-button>
           </div>
         </div>
 
-        <ion-button expand="block" class="mt-4" color="tertiary" (click)="onDone()">
+        <ion-button expand="block" shape="round" class="mt-4 font-bold h-11" color="tertiary" (click)="onDone()">
           Done
         </ion-button>
       </div>
 
-      <ion-item>
-        <ion-label position="stacked">Guest Name</ion-label>
-        <ion-input [(ngModel)]="guest.visitorName"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="stacked">Mobile Number</ion-label>
-        <ion-input type="tel" [(ngModel)]="guest.mobile"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-label position="stacked">Visit Date</ion-label>
-        <ion-datetime-button slot="end" datetime="visitDate"></ion-datetime-button>
-      </ion-item>
-      <ion-modal [keepContentsMounted]="true">
-        <ng-template>
-          <ion-datetime
-            id="visitDate"
-            presentation="date"
-            [(ngModel)]="guest.validDate"
-            [showDefaultButtons]="true"
-            cancelText="Close"
-            doneText="Done"
-          ></ion-datetime>
-        </ng-template>
-      </ion-modal>
+      <div class="space-y-4 pt-2">
+        <app-common-input label="Guest Name" iconName="person-outline" placeholder="Enter guest name" [(ngModel)]="guest.visitorName"></app-common-input>
+        <app-common-input label="Mobile Number" type="tel" iconName="call-outline" placeholder="Enter mobile number" [(ngModel)]="guest.mobile"></app-common-input>
+        <app-common-date label="Visit Date" iconName="calendar-outline" [(ngModel)]="guest.validDate"></app-common-date>
+      </div>
 
-      <ion-button expand="block" color="tertiary" (click)="onSubmit()" [disabled]="!isValid()" class="ion-margin-top">
+      <ion-button expand="block" shape="round" color="tertiary" (click)="onSubmit()" [disabled]="!isValid()" class="mt-6 font-bold h-12 [--box-shadow:none]">
         Generate Pre-Approval
       </ion-button>
 
@@ -98,7 +81,7 @@ import { AppHeaderComponent } from '../../../components/app-header/app-header.co
     </ion-content>
   `,
   standalone: true,
-  imports: [CommonModule, FormsModule, IonicModule, AppHeaderComponent]
+  imports: [CommonModule, FormsModule, IonicModule, AppHeaderComponent, CommonInputComponent, CommonDateComponent]
 })
 export class PreApprovePage {
   guest = {
@@ -106,6 +89,7 @@ export class PreApprovePage {
     mobile: '',
     validDate: new Date().toISOString(),
   };
+
   qrToken = '';
   qrDataUrl: SafeUrl | null = null;
   isQrModalOpen = false;

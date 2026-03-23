@@ -7,55 +7,49 @@
     <p class="mt-1 text-[13px] text-slate-500" *ngIf="sectionTitle === 'Add'">Create a new user</p>
   </div> -->
 
-  <div slot="fixed" class="py-2 px-2 residents-search">
-    <ion-searchbar [(ngModel)]="searchTerm" (ionInput)="filterUsers()" placeholder="Search name, flat, mobile, id"
-      debounce="150" show-clear-button="focus" class=""></ion-searchbar>
+  <div slot="fixed" class="py-2.5 px-3 flex items-center gap-2 residents-search bg-white border-b border-slate-100/80">
+    <ion-searchbar [(ngModel)]="searchTerm" (ionInput)="filterUsers()" placeholder="Search name, flat, mobile..."
+      debounce="150" show-clear-button="focus" class="flex-1 m-0 text-[14px]"></ion-searchbar>
+    <ion-button (click)="openAdd()" class="h-11 m-0 font-bold [--border-radius:14px]" color="primary">
+      <ion-icon name="add" slot="start"></ion-icon>
+      Add
+    </ion-button>
   </div>
 
   <div class="animate__animated animate__fadeIn">
-    <ion-list lines="inset" *ngIf="filteredUsers.length">
-      <ion-item-sliding *ngFor="let u of filteredUsers">
-        <ion-item class="py-1">
-          <ion-avatar slot="start"
-            class="mr-4 flex items-center justify-center bg-[var(--ion-color-primary-light,#e0e7ff)]">
-            <img class="h-full" *ngIf="u.photoURL" [src]="u.photoURL" />
-            <div *ngIf="!u.photoURL" class="text-[1.2rem] font-bold text-[var(--ion-color-primary)]">
-              {{ u.userName.charAt(0) }}
-            </div>
-          </ion-avatar>
-          <ion-label class="min-w-0">
-            <h2 class="mb-1 truncate text-[1rem] font-semibold">{{ u.userName }}</h2>
-            <p class="my-0.5 flex items-center gap-1.5 truncate text-[13px]" *ngIf="u.flatNumber">
-              <ion-icon name="business-outline"></ion-icon>
-              <span>Flat {{ u.flatNumber }}</span>
-            </p>
-            <p class="my-0.5 flex items-center gap-1.5 truncate text-[13px]">
-              <ion-icon name="call-outline"></ion-icon> {{ u.mobileNumber }}
-            </p>
-            <p class="my-0.5 flex items-center gap-1.5 truncate text-[13px] text-[var(--ion-color-medium)]">
-              Role: {{ u.role }}
-            </p>
-          </ion-label>
-          <div class="flex gap-2">
-            <ion-button class="flex m-0" slot="end" fill="clear" (click)="openEdit(u)" aria-label="Edit user">
-              <ion-icon class="text-xl" name="create-outline" slot="icon-only"></ion-icon>
-            </ion-button>
-            <ion-button class="flex m-0" slot="end" fill="clear" color="danger" (click)="confirmDelete(u)"
-              aria-label="Delete user">
-              <ion-icon class="text-xl" name="trash" slot="icon-only"></ion-icon>
-            </ion-button>
+    <ion-list lines="inset" *ngIf="filteredUsers.length" class="bg-transparent">
+      <ion-item *ngFor="let u of filteredUsers" class="py-1">
+        <ion-avatar slot="start"
+          class="mr-3 flex items-center justify-center bg-[var(--ion-color-primary-light,#e0e7ff)] rounded-2xl">
+          <img class="h-full rounded-2xl" *ngIf="u.photoURL" [src]="u.photoURL" />
+          <div *ngIf="!u.photoURL" class="text-[1.2rem] font-extrabold text-[var(--ion-color-primary)]">
+            {{ u.userName.charAt(0) }}
           </div>
-        </ion-item>
-        <!-- <ion-item-options side="end" class="">
-          <ion-item-option color="medium" (click)="openEdit(u)" aria-label="Edit user">
-            <ion-icon class="text-lg" name="create-outline" slot="icon-only"></ion-icon>
-          </ion-item-option>
-          <ion-item-option color="danger" (click)="confirmDelete(u)" aria-label="Delete user">
-            <ion-icon class="text-lg" name="trash" slot="icon-only"></ion-icon>
-          </ion-item-option>
-        </ion-item-options> -->
-      </ion-item-sliding>
+        </ion-avatar>
+        <ion-label class="min-w-0">
+          <h2 class="mb-1 truncate text-[15px] font-bold text-slate-800">{{ u.userName }}</h2>
+          <p class="my-0.5 flex items-center gap-1.5 truncate text-[12px] font-medium text-slate-500"
+            *ngIf="u.flatNumber">
+            <ion-icon name="business" class="text-slate-400"></ion-icon>
+            <span>Flat {{ u.flatNumber }}</span>
+          </p>
+          <p class="my-0.5 flex items-center gap-1.5 truncate text-[12px] font-medium text-slate-500">
+            <ion-icon name="call" class="text-slate-400"></ion-icon> {{ u.mobileNumber }}
+          </p>
+        </ion-label>
+        <div class="flex gap-1" slot="end">
+          <ion-button class="m-0" fill="clear" color="medium" (click)="openEdit(u); $event.stopPropagation()"
+            aria-label="Edit user">
+            <ion-icon class="text-[19px]" name="create-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+          <ion-button class="m-0" fill="clear" color="danger" (click)="confirmDelete(u); $event.stopPropagation()"
+            aria-label="Delete user">
+            <ion-icon class="text-[19px]" name="trash-outline" slot="icon-only"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-item>
     </ion-list>
+
 
     <div class="flex flex-col items-center justify-center px-5 py-[50px] text-center text-[var(--ion-color-medium)]"
       *ngIf="!filteredUsers.length && users.length">

@@ -16,7 +16,7 @@ import { CommonSelectComponent } from '../../../components/common-select/common-
 
   styles: [`
     ion-content.residents-content {
-      --padding-top: 64px;
+      --padding-top: 76px;
     }
 
     .residents-search {

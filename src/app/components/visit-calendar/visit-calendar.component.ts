@@ -41,19 +41,31 @@ import { Visitor } from '../../models/visitor.model';
       />
     </div>
 
+        <div class="mt-4 flex gap-2 mb-3 bg-slate-100 p-1 rounded-[14px] items-center text-center">
+          <button (click)="changeTab('all')" class="flex-1 py-1.5 px-3 rounded-xl text-[12px] font-bold transition-all duration-200" [ngClass]="selectedTab === 'all' ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(0,0,0,0.05)]' : 'text-slate-500'">
+              All
+          </button>
+          <button (click)="changeTab('walk-in')" class="flex-1 py-1.5 px-3 rounded-xl text-[12px] font-bold transition-all duration-200" [ngClass]="selectedTab === 'walk-in' ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(0,0,0,0.05)]' : 'text-slate-500'">
+              Wal-In
+          </button>
+          <button (click)="changeTab('pre-approved')" class="flex-1 py-1.5 px-3 rounded-xl text-[12px] font-bold transition-all duration-200" [ngClass]="selectedTab === 'pre-approved' ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(0,0,0,0.05)]' : 'text-slate-500'">
+              Pre-Approved
+          </button>
+        </div>
+
         <ng-container *ngIf="showList">
           <ion-list
-            class="mt-3 overflow-hidden rounded-[14px] border border-slate-200 bg-white"
+            class="mt-1 overflow-hidden rounded-[14px] border border-slate-200 bg-white"
             *ngIf="filteredVisitors.length > 0; else empty"
           >
             <ion-item *ngFor="let v of filteredVisitors" lines="full" class="min-h-14">
               <ion-label class="min-w-0">
                 <div class="flex items-center justify-between gap-2">
                   <div class="min-w-0">
-                    <div class="truncate text-[14px] font-semibold text-slate-800">{{ v.visitorName }}</div>
+                    <div class="truncate text-[14px] font-bold text-slate-800">{{ v.visitorName }}</div>
                     <div class="truncate text-[12px] text-slate-500">
                       Flat {{ v.flatNumber }} • {{ v.mobile }}
-                      <span *ngIf="v.purpose"> • {{ v.purpose }}</span>
+                      <span *ngIf="v.purpose" class="text-slate-400"> ({{ v.purpose }})</span>
                     </div>
                     <div class="mt-0.5 text-[11px] text-slate-400">{{ getVisitorDate(v) | date:'shortTime' }}</div>
                   </div>
@@ -66,7 +78,7 @@ import { Visitor } from '../../models/visitor.model';
           </ion-list>
 
           <ng-template #empty>
-            <div class="px-4 py-6 text-center text-slate-400">
+            <div class="px-4 py-8 text-center text-slate-400">
               <div class="text-[13px]">{{ emptyText }}</div>
             </div>
           </ng-template>
@@ -87,6 +99,7 @@ export class VisitCalendarComponent implements OnChanges {
   filteredVisitors: Visitor[] = [];
   isCalendarOpen = false;
   readonly triggerId = `visit-cal-trigger-${Math.random().toString(36).slice(2)}`;
+  selectedTab: 'all' | 'walk-in' | 'pre-approved' = 'all';
 
 
 
@@ -152,12 +165,25 @@ export class VisitCalendarComponent implements OnChanges {
     this.isCalendarOpen = false;
   }
 
+  changeTab(tab: 'all' | 'walk-in' | 'pre-approved') {
+    this.selectedTab = tab;
+    this.applyFilter();
+  }
+
   private applyFilter() {
     const selected = this.currentSelectedDate;
-    this.filteredVisitors = (this.visitors ?? [])
-      .filter((v) => this.toLocalIsoDate(this.getVisitorDate(v)) === selected)
-      .sort((a, b) => this.getVisitorDate(b).getTime() - this.getVisitorDate(a).getTime());
+    let list = (this.visitors ?? [])
+      .filter((v) => this.toLocalIsoDate(this.getVisitorDate(v)) === selected);
+
+    if (this.selectedTab === 'walk-in') {
+      list = list.filter(v => v.purpose !== 'Pre-Approved Guest');
+    } else if (this.selectedTab === 'pre-approved') {
+      list = list.filter(v => v.purpose === 'Pre-Approved Guest');
+    }
+
+    this.filteredVisitors = list.sort((a, b) => this.getVisitorDate(b).getTime() - this.getVisitorDate(a).getTime());
   }
+
 
   getVisitorDate(v: Visitor): Date {
     const raw = (v.checkInTime ?? v.createdAt) as any;
