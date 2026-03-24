@@ -97,7 +97,7 @@ type UserRole = 'admin' | 'resident' | 'gatekeeper';
               </app-common-select>
             </div>
 
-            <div class="mt-5 border-t border-dashed border-slate-200 pt-5 text-left" *ngIf="otpSent">
+            <div class="mt-5 pt-5 text-left" *ngIf="otpSent">
               <div
                 class="mb-4 inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-600">
                 OTP Verification
@@ -159,6 +159,19 @@ export class LoginPage {
 
   ngOnInit() {
     this.checkServerStatus();
+    const savedRole = localStorage.getItem('userRole') as UserRole;
+    if (savedRole) {
+      this.setTheme(savedRole);
+    }
+  }
+  setTheme(role: UserRole) {
+    const themes = ['admin-theme', 'gatekeeper-theme', 'resident-theme'];
+
+    document.body.classList.remove(...themes);
+    document.documentElement.classList.remove(...themes);
+
+    document.body.classList.add(`${role}-theme`);
+    document.documentElement.classList.add(`${role}-theme`);
   }
 
   checkServerStatus() {
@@ -225,7 +238,17 @@ export class LoginPage {
     try {
       const response = await this.authService.verifyOtp(this.otp, this.role);
 
-      if (!response.success) {
+      if (response.success) {
+        this.setTheme(this.role); // 🔥 APPLY THEME
+
+        localStorage.setItem('userRole', this.role);
+
+        this.showToast('Login successful!');
+
+        // optional navigation
+        // this.router.navigate(['/dashboard']);
+
+      } else {
         this.showToast(response.message || 'Invalid OTP. Please try again.', 4000);
       }
     } catch (error) {

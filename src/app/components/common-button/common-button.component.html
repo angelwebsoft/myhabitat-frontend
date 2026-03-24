@@ -1,0 +1,19 @@
+<ion-button [expand]="expand" [color]="color" [fill]="fill" [disabled]="disabled || isLoading" (click)="onClick($event)"
+    [size]="size === 'auto' ? undefined : size" [class]="'m-0 font-extrabold transition-all active:scale-95 [--border-radius:14px] ' +
+           (size === 'small' ? 'h-10 text-[13px]' : size === 'large' ? 'h-14 text-base' : size === 'auto' ? 'h-full ' : 'h-12 text-[15px]') +
+           ' ' + customClass">
+    <div class="flex items-center justify-center gap-2 w-full h-full">
+        <!-- Spinner for Loading State -->
+        <ion-spinner *ngIf="isLoading" name="crescent" class="h-5 w-5"></ion-spinner>
+
+        <!-- Start Icon -->
+        <ion-icon *ngIf="icon && iconPosition === 'start' && !isLoading" [name]="icon" class="text-[1.2rem]"></ion-icon>
+
+        <!-- Label -->
+        <span *ngIf="!isLoading && label" class="truncate">{{ label }}</span>
+        <span *ngIf="isLoading" class="truncate">{{ loadingText }}</span>
+
+        <!-- End Icon -->
+        <ion-icon *ngIf="icon && iconPosition === 'end' && !isLoading" [name]="icon" class="text-[1.2rem]"></ion-icon>
+    </div>
+</ion-button>

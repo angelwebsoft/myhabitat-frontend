@@ -9,13 +9,19 @@ import { Router } from '@angular/router';
 import { map } from 'rxjs/operators';
 import { AppHeaderComponent } from '../../../components/app-header/app-header.component';
 import { VisitCalendarComponent } from '../../../components/visit-calendar/visit-calendar.component';
+import { FormsModule } from '@angular/forms';
+import { CommonInputComponent } from '../../../components/common-input/common-input.component';
+import { CommonButtonComponent } from 'src/app/components/common-button/common-button.component';
 
 @Component({
   selector: 'app-gatekeeper-dashboard',
   template: `
-    <app-header title="Gatekeeper Dashboard" color="warning" titleColor="dark"></app-header>
+    <ion-header class="ion-no-border">
+      <app-header title="Gatekeeper Dashboard" color="primary" titleColor="dark"></app-header>
+    </ion-header>
 
-    <ion-content color="light">
+    <ion-content >
+    <div style="background: var(--ion-color-primary-light);">
       <div class="rounded-b-[32px] bg-white px-4 pb-5 pt-4 shadow-[0_4px_16px_rgba(15,23,42,0.04)]" *ngIf="currentUser$ | async as user">
         <!-- Top row: Avatar + Name and Action Capsule -->
         <div class="flex items-center justify-between gap-2">
@@ -25,23 +31,23 @@ import { VisitCalendarComponent } from '../../../components/visit-calendar/visit
               <img class="h-full w-full rounded-[12px] object-cover" [src]="'https://ionicframework.com/docs/img/demos/avatar.svg'" />
             </div>
             <div class="min-w-0 flex-1">
-              <h2 class="truncate text-[14px] font-extrabold text-slate-900 leading-tight">{{ user.userName }}</h2>
-              <p class="text-[11px] font-medium text-slate-400">GateKeeper</p>
+              <h2 class="truncate text-[14px] font-extrabold text-slate-900 leading-tight m-0">{{ user.userName }}</h2>
+              <p class="text-[11px] font-medium text-slate-400 m-0">GateKeeper</p>
             </div>
           </div>
 
           <!-- Action Capsule Right -->
-          <div class="flex items-center h-8.5 shrink-0 overflow-hidden rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-[0_4px_10px_rgba(var(--ion-color-warning-rgb),0.25)]">
-            <button (click)="onNewEntry()" class="flex h-full items-center gap-0.5 px-2.5 py-2 text-[11px] font-extrabold text-white transition-opacity active:opacity-75">
-              <ion-icon name="add" class="text-base"></ion-icon>
-              New
-            </button>
-            <div class="h-3.5 w-[1px] bg-white/30"></div>
-            <button (click)="onScanQr()" class="flex h-full items-center gap-1 px-2.5 py-2 text-[11px] font-extrabold text-white transition-opacity active:opacity-75">
-              <ion-icon name="qr-code-outline" class="text-[14px]"></ion-icon>
-              Scan
-            </button>
-          </div>
+         
+          <app-common-button
+            label=""
+            fill="solid"
+            icon="qr-code-outline"
+            (btnClick)="onScanQr()"
+            size="small"
+            customClass="font-extrabold flex items-center justify-center gap-0 rounded-full"
+            color="primary"
+          ></app-common-button>  
+        
         </div>
 
         <!-- Greeting Middle -->
@@ -50,18 +56,17 @@ import { VisitCalendarComponent } from '../../../components/visit-calendar/visit
         </div>
 
         <!-- Search input Bottom -->
-        <div class="mt-4 relative flex items-center h-11 rounded-full bg-slate-100 px-4 text-slate-400">
-          <ion-icon name="search" class="text-lg mr-2 text-slate-400"></ion-icon>
-          <input 
-            type="text" 
+        <div class="mt-4">
+          <app-common-input 
             placeholder="Search requests..." 
-            (input)="onSearchChange($event)"
-            class="w-full bg-transparent text-[14px] text-slate-800 outline-none placeholder:text-slate-400" 
-          />
+            iconName="search"
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="onSearchChange($event)"
+          ></app-common-input>
         </div>
       </div>
 
-      <div class="px-3 pb-5 pt-3">
+      <div class="px-3 pt-3" style="padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 108px);">
         <visit-calendar
           [visitors]="(visitors$ | async) ?? []"
           title="Visits Calendar"
@@ -69,6 +74,7 @@ import { VisitCalendarComponent } from '../../../components/visit-calendar/visit
           [showList]="false"
           [selectedDate]="selectedDate"
           (selectedDateChange)="onSelectedDateChange($event)"
+          (tabChange)="onTabChange($event)"
         ></visit-calendar>
 
         <div class="pt-3">
@@ -114,17 +120,17 @@ import { VisitCalendarComponent } from '../../../components/visit-calendar/visit
         </div>
 
         <!-- Safe Area Spacer to keep items from bleeding behind floating actions/bottom keys -->
-        <div [style.height]="'calc(env(safe-area-inset-bottom, 0px) + 80px)'"></div>
       </div>
+    </div>
     </ion-content>
 
     <!-- Native Fixed Floating Action Button (Replaces ion-fab) -->
-    <button (click)="onNewEntry()" [style.bottom]="'calc(env(safe-area-inset-bottom, 0px) + 24px)'" class="fixed right-5 z-[99] flex h-[56px] w-[56px] items-center justify-center rounded-full bg-[var(--ion-color-warning)] shadow-[0_6px_16px_rgba(var(--ion-color-warning-rgb),0.4)] transition-transform active:scale-95 sm:bottom-8 sm:right-8">
+    <ion-button (click)="onNewEntry()" [style.bottom]="'calc(env(safe-area-inset-bottom, 0px) + 24px)'" class="fixed right-5 z-[99] flex h-[56px] w-[56px] items-center justify-center rounded-full bg-[var(--ion-color-warning)] shadow-[0_6px_16px_rgba(var(--ion-color-warning-rgb),0.4)] transition-transform active:scale-95 sm:bottom-8 sm:right-8" style="--border-radius: 50%;">
       <ion-icon name="add" class="text-[32px] text-white"></ion-icon>
-    </button>
+    </ion-button>
   `,
   standalone: true,
-  imports: [CommonModule, IonicModule, AppHeaderComponent, VisitCalendarComponent]
+  imports: [CommonModule, IonicModule, AppHeaderComponent, VisitCalendarComponent, CommonInputComponent, FormsModule, CommonButtonComponent]
 })
 export class GatekeeperDashboardPage implements OnInit {
   visitors$: Observable<Visitor[]> = of([]);
@@ -135,7 +141,13 @@ export class GatekeeperDashboardPage implements OnInit {
   private currentGatekeeperId = '';
   selectedDate = this.toLocalIsoDate(new Date());
   private selectedDate$ = new BehaviorSubject<string>(this.selectedDate);
+  private selectedTab$ = new BehaviorSubject<'all' | 'walk-in' | 'pre-approved'>('all');
   private searchTerm$ = new BehaviorSubject<string>('');
+  searchTerm: string = '';
+
+  onTabChange(tab: 'all' | 'walk-in' | 'pre-approved') {
+    this.selectedTab$.next(tab);
+  }
 
   private dataService = inject(DataService);
   private authService = inject(AuthService);
@@ -161,19 +173,25 @@ export class GatekeeperDashboardPage implements OnInit {
         map(list => [...list].sort((a, b) => this.getStatusPriority(a.status) - this.getStatusPriority(b.status)))
       );
 
-      this.visitorsForSelectedDate$ = combineLatest([this.visitors$, this.selectedDate$, this.searchTerm$]).pipe(
-        map(([list, selectedDate, searchTerm]) =>
-          [...list]
-            .filter((v) => this.toLocalIsoDate(this.getVisitorDate(v)) === selectedDate)
-            .filter((v) => !searchTerm || v.visitorName.toLowerCase().includes(searchTerm.toLowerCase()) || v.mobile?.includes(searchTerm))
-            .sort((a, b) => this.getVisitorDate(b).getTime() - this.getVisitorDate(a).getTime())
-        )
+      this.visitorsForSelectedDate$ = combineLatest([this.visitors$, this.selectedDate$, this.searchTerm$, this.selectedTab$]).pipe(
+        map(([list, selectedDate, searchTerm, tab]) => {
+          let filtered = [...list].filter((v) => this.toLocalIsoDate(this.getVisitorDate(v)) === selectedDate);
+          if (searchTerm) {
+            filtered = filtered.filter(v => v.visitorName.toLowerCase().includes(searchTerm.toLowerCase()) || v.mobile?.includes(searchTerm));
+          }
+          if (tab === 'walk-in') {
+            filtered = filtered.filter(v => v.purpose !== 'Pre-Approved Guest');
+          } else if (tab === 'pre-approved') {
+            filtered = filtered.filter(v => v.purpose === 'Pre-Approved Guest');
+          }
+          return filtered.sort((a, b) => this.getVisitorDate(b).getTime() - this.getVisitorDate(a).getTime());
+        })
       );
     });
   }
 
   onSearchChange(ev: any) {
-    const term = ev?.target?.value || '';
+    const term = typeof ev === 'string' ? ev : ev?.target?.value || '';
     this.searchTerm$.next(term);
   }
 

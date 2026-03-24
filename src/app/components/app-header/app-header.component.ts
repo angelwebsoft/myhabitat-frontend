@@ -59,21 +59,17 @@ import { IonicModule, MenuController, NavController } from '@ionic/angular';
     }
   `],
   template: `
-    <header class="ion-no-border p-4" [style.background-color]="color.startsWith('#') || color.startsWith('rgb') ? color : 'var(--ion-color-' + color + ')'">
+    <header class="ion-no-border p-4" style="background: var(--ion-color-primary);">
       <div [style.padding-top]="'calc(env(safe-area-inset-top, 0px) + 8px)'" class="flex items-center justify-between px-4 pb-2">
         <ion-buttons *ngIf="showBack" slot="start" class="ml-0 absolute left-3 z-[20]">
-          <button (click)="goBack()" class="flex items-center justify-center rounded-full text-white">
-            <ion-icon name="arrow-back-outline" class="text-2xl"></ion-icon>
-          </button>
+            <ion-icon (click)="goBack()" name="arrow-back-outline" class="text-2xl text-white"></ion-icon>
         </ion-buttons>
 
         <ion-title class="ml-1 text-center absolute w-full left-0 right-0 text-white" [ngClass]="{ 'pl-0': !showBack }" [color]="titleColor">{{ title }}</ion-title>
 
         <ion-buttons class="absolute right-3 z-[20]" *ngIf="showMenuButton" slot="end">
-          <ion-menu-toggle menu="main-menu" class="m-0 p-0 block">
-            <button class="flex items-center justify-center rounded-full text-white">
-              <ion-icon name="menu-outline" class="text-3xl"></ion-icon>
-            </button>
+          <ion-menu-toggle menu="main-menu" class="mt-1 p-0">
+              <ion-icon name="menu-outline" class="text-3xl text-white"></ion-icon>
           </ion-menu-toggle>
         </ion-buttons>
       </div>

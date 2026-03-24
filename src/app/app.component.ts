@@ -7,7 +7,8 @@ import { IonApp, IonAvatar, IonButton, IonContent, IonIcon, IonItem, IonLabel, I
 import { distinctUntilChanged, map } from 'rxjs';
 import { AuthService } from './services/auth.service';
 import { PushNotificationsService } from './services/push-notifications.service';
-
+import { StatusBar } from '@capacitor/status-bar';
+type UserRole = 'admin' | 'resident' | 'gatekeeper';
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -28,6 +29,7 @@ import { PushNotificationsService } from './services/push-notifications.service'
     IonRouterOutlet
   ],
 })
+
 export class AppComponent {
   private authService = inject(AuthService);
   private menuCtrl = inject(MenuController);
@@ -38,6 +40,28 @@ export class AppComponent {
 
   currentUser$ = this.authService.currentUser$.asObservable();
   isNative = this.platform.is('hybrid') || this.platform.is('capacitor') || this.platform.is('cordova');
+  ngOnInit() {
+    // Left empty or can load other static init things if needed
+    StatusBar.setOverlaysWebView({ overlay: false });
+  }
+
+
+  setTheme(role: string) {
+    const themes = ['admin-theme', 'gatekeeper-theme', 'resident-theme'];
+    document.body.classList.remove(...themes);
+    document.documentElement.classList.remove(...themes);
+
+    if (role === 'admin') {
+      document.body.classList.add('admin-theme');
+      document.documentElement.classList.add('admin-theme');
+    } else if (role === 'gatekeeper') {
+      document.body.classList.add('gatekeeper-theme');
+      document.documentElement.classList.add('gatekeeper-theme');
+    } else if (role === 'resident') {
+      document.body.classList.add('resident-theme');
+      document.documentElement.classList.add('resident-theme');
+    }
+  }
 
   constructor() {
     this.authService.currentUser$
@@ -60,7 +84,10 @@ export class AppComponent {
       )
       .subscribe((user) => {
         if (user) {
+          this.setTheme(user.role);
           void this.push.initForWeb(user);
+        } else {
+          this.setTheme(''); // Clearing theme layouts if logged out
         }
       });
   }

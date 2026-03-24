@@ -17,88 +17,112 @@ import { VisitCalendarComponent } from '../../../components/visit-calendar/visit
 @Component({
   selector: 'app-resident-dashboard',
   template: `
-    <app-header [title]="headerTitle" color="tertiary"></app-header>
+    <ion-header class="ion-no-border">
+      <app-header [title]="headerTitle" color="tertiary"></app-header>
+    </ion-header>
 
-    <ion-content color="light">
-      <div class="pb-4 px-4 rounded-b-[28px] bg-[var(--ion-color-tertiary)] text-white shadow-[0_8px_24px_rgba(15,23,42,0.08)]">
-        <h1 class="m-0 text-[1.55rem] font-extrabold">Visitor Requests</h1>
-        <!-- <p class="mt-1 text-[1rem] font-semibold text-white">{{ residentName }}</p> -->
-        <p class="mt-1 text-[13px] opacity-80">You have {{ pendingCount }} pending requests</p>
-      </div>
+    <ion-content scroll-y="false" color="light">
+      <div class="flex flex-col h-full">
+        <div class="pb-4 px-4 rounded-b-[28px] bg-[var(--ion-color-tertiary)] text-white shadow-[0_8px_24px_rgba(15,23,42,0.08)]">
+          <h1 class="m-0 text-[1.55rem] font-extrabold">Visitor Requests</h1>
+          <p class="mt-1 text-[13px] opacity-80">You have {{ pendingCount }} pending requests</p>
+        </div>
 
-      <div class="px-3 pt-3">
-        <visit-calendar
-          [visitors]="(visitors$ | async) ?? []"
-          title="Visits Calendar"
-          subtitle="Your visitors (date-wise)"
-          [showList]="false"
-          [selectedDate]="selectedDate"
-          (selectedDateChange)="onSelectedDateChange($event)"
-        ></visit-calendar>
-      </div>
+        <div class="px-3 pt-3">
+          <visit-calendar customClass="sticky top-0 z-10"
+            [visitors]="(visitors$ | async) ?? []"
+            title="Visits Calendar"
+            subtitle="Your visitors (date-wise)"
+            [showList]="false"
+            [selectedDate]="selectedDate"
+            (selectedDateChange)="onSelectedDateChange($event)"
+            (tabChange)="onTabChange($event)"
+          ></visit-calendar>
+        </div>
 
-      <div class="animate__animated animate__fadeIn px-3 pt-3">
-        <ion-card class="mb-3 rounded-[18px] border border-black/[0.02] shadow-[0_8px_20px_rgba(0,0,0,0.06)]" *ngFor="let visitor of visitorsForSelectedDate$ | async">
-          <div class="flex items-center gap-3 p-4">
-            <ion-avatar class="h-[52px] w-[52px] border-2 border-[var(--ion-color-tertiary-light,#f0f0f0)]">
-              <img class="h-full" [src]="visitor.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg'" />
-            </ion-avatar>
-            <div class="min-w-0">
-              <ion-badge [color]="getStatusColor(visitor.status)" class="mb-1.5 inline-flex items-center gap-1 rounded-md px-2 py-1 text-[0.65rem] tracking-[0.5px]">
-                <div class="dot" *ngIf="visitor.status === 'pending'"></div>{{ getStatusLabel(visitor.status) }}
-              </ion-badge>
-              <h2 class="m-0 truncate text-[15px] font-bold text-slate-800">{{ visitor.visitorName }}</h2>
-              <p class="m-0.5 truncate text-[13px] text-slate-500">{{ visitor.purpose }}</p>
-            </div>
-          </div>
+        <!-- scrollthis Area holding list views independently scrolled -->
+        <div class="flex-1 overflow-y-auto">
           
-          <ion-card-content>
-            <div class="mb-4 flex flex-col gap-2 border-t border-slate-100 pt-3 sm:flex-row sm:gap-5">
-              <div class="flex items-center gap-1.5 text-[13px] text-slate-500">
-                <ion-icon name="time-outline"></ion-icon>
-                <span>{{ visitor.createdAt | date:'shortTime' }}</span>
+          <div class="animate__animated animate__fadeIn px-3 pt-3 scrollthis">
+            <ion-card class="mb-3 rounded-[18px] border border-black/[0.02] shadow-[0_8px_20px_rgba(0,0,0,0.06)]" *ngFor="let visitor of visitorsForSelectedDate$ | async">
+              <div class="flex items-center gap-3 p-4">
+                <ion-avatar class="h-[52px] w-[52px] border-2 border-[var(--ion-color-tertiary-light,#f0f0f0)]">
+                  <img class="h-full" [src]="visitor.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg'" />
+                </ion-avatar>
+                <div class="min-w-0">
+                  <ion-badge [color]="getStatusColor(visitor.status)" class="mb-1.5 inline-flex items-center gap-1 rounded-md px-2 py-1 text-[0.65rem] tracking-[0.5px]">
+                    <div class="dot" *ngIf="visitor.status === 'pending'"></div>{{ getStatusLabel(visitor.status) }}
+                  </ion-badge>
+                  <h2 class="m-0 truncate text-[15px] font-bold text-slate-800">{{ visitor.visitorName }}</h2>
+                  <p class="m-0.5 truncate text-[13px] text-slate-500">{{ visitor.purpose }}</p>
+                </div>
               </div>
-              <div class="flex items-center gap-1.5 text-[13px] text-slate-500">
-                <ion-icon name="call-outline"></ion-icon>
-                <span>{{ visitor.mobile }}</span>
-              </div>
-            </div>
+              
+              <ion-card-content>
+                <div class="mb-4 flex flex-col gap-2 border-t border-slate-100 pt-3 sm:flex-row sm:gap-5">
+                  <div class="flex items-center gap-1.5 text-[13px] text-slate-500">
+                    <ion-icon name="time-outline"></ion-icon>
+                    <span>{{ visitor.createdAt | date:'shortTime' }}</span>
+                  </div>
+                  <div class="flex items-center gap-1.5 text-[13px] text-slate-500">
+                    <ion-icon name="call-outline"></ion-icon>
+                    <span>{{ visitor.mobile }}</span>
+                  </div>
+                </div>
 
-            <div class="grid grid-cols-2 gap-2.5" *ngIf="visitor.status === 'pending'">
-              <ion-button color="danger" fill="clear" (click)="onAction(visitor.id, 'rejected')" class="m-0 h-11 text-[13px] font-bold [--border-radius:12px]">
-                <ion-icon name="close-circle-outline" slot="start"></ion-icon>
-                Decline
-              </ion-button>
-              <ion-button color="success" (click)="onAction(visitor.id, 'approved')" class="m-0 h-11 text-[13px] font-bold [--border-radius:12px] [--box-shadow:0_4px_12px_rgba(var(--ion-color-success-rgb),0.3)]">
-                <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
-                Authorize
-              </ion-button>
-            </div>
-          </ion-card-content>
-        </ion-card>
-      </div>
+                <div class="grid grid-cols-2 gap-2.5" *ngIf="visitor.status === 'pending'">
+                  <ion-button color="danger" fill="clear" (click)="onAction(visitor.id, 'rejected')" class="m-0 h-11 text-[13px] font-bold [--border-radius:12px]">
+                    <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+                    Decline
+                  </ion-button>
+                  <ion-button color="success" (click)="onAction(visitor.id, 'approved')" class="m-0 h-11 text-[13px] font-bold [--border-radius:12px] [--box-shadow:0_4px_12px_rgba(var(--ion-color-success-rgb),0.3)]">
+                    <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+                    Authorize
+                  </ion-button>
+                </div>
+              </ion-card-content>
+            </ion-card>
+          </div>
 
-      <div class="px-3 pb-3" *ngIf="preApprovedForSelectedDate.length">
-        <h2 class="mb-2 mt-2 text-[14px] font-extrabold text-slate-800">Pre-Approved Guests</h2>
-        <ion-card class="mb-3 rounded-[18px] border border-black/[0.02] shadow-[0_8px_20px_rgba(0,0,0,0.06)]" *ngFor="let g of preApprovedForSelectedDate">
-          <ion-card-content>
-            <div class="flex items-start justify-between gap-3">
-              <button type="button" class="shrink-0 rounded-xl border border-slate-200 bg-white p-2" (click)="openPreQr(g)">
-                <img *ngIf="preQrById[g.id]" [src]="preQrById[g.id]" alt="QR" class="h-[74px] w-[74px]" />
-                <div *ngIf="!preQrById[g.id]" class="flex h-[74px] w-[74px] items-center justify-center text-[12px] text-slate-400">QR</div>
-              </button>
+          <div class="px-3 pb-3" *ngIf="preApprovedForSelectedDate.length && (selectedTab$ | async) !== 'walk-in'">
+            <h2 class="mb-2 mt-2 text-[14px] font-extrabold text-slate-800">Pre-Approved Guests</h2>
+            <ion-card class="mb-3 rounded-[18px] border border-black/[0.02] shadow-[0_8px_20px_rgba(0,0,0,0.06)]" *ngFor="let g of preApprovedForSelectedDate">
+              <ion-card-content>
+                <div class="flex items-start justify-between gap-3">
+                  <button type="button" class="shrink-0 rounded-xl border border-slate-200 bg-white p-2" (click)="openPreQr(g)">
+                    <img *ngIf="preQrById[g.id]" [src]="preQrById[g.id]" alt="QR" class="h-[74px] w-[74px]" />
+                    <div *ngIf="!preQrById[g.id]" class="flex h-[74px] w-[74px] items-center justify-center text-[12px] text-slate-400">QR</div>
+                  </button>
 
-              <div class="min-w-0 flex-1">
-                <h3 class="m-0 truncate text-[15px] font-bold text-slate-800">{{ g.visitorName }}</h3>
-                <p class="mt-1 truncate text-[13px] text-slate-500">{{ g.mobile }} • {{ g.validDate | date:'mediumDate' }}</p>
-                <p class="mt-1 truncate text-[12px] text-slate-400">Token: {{ g.qrToken || '-' }}</p>
-              </div>
-              <ion-badge [color]="getPreApprovedColor(g)" class="shrink-0 rounded-md px-2 py-1 text-[10px] font-semibold">
-                {{ getPreApprovedLabel(g) }}
-              </ion-badge>
+                  <div class="min-w-0 flex-1">
+                    <h3 class="m-0 truncate text-[15px] font-bold text-slate-800">{{ g.visitorName }}</h3>
+                    <p class="mt-1 truncate text-[13px] text-slate-500">{{ g.mobile }} • {{ g.validDate | date:'mediumDate' }}</p>
+                    <p class="mt-1 truncate text-[12px] text-slate-400">Token: {{ g.qrToken || '-' }}</p>
+                  </div>
+                  <ion-badge [color]="getPreApprovedColor(g)" class="shrink-0 rounded-md px-2 py-1 text-[10px] font-semibold">
+                    {{ getPreApprovedLabel(g) }}
+                  </ion-badge>
+                </div>
+              </ion-card-content>
+            </ion-card>
+          </div>
+
+          <!-- empty view setup encompassing all states setup -->
+          <div *ngIf="((selectedTab$ | async) === 'all' && (visitorsForSelectedDate$ | async)?.length === 0 && preApprovedForSelectedDate.length === 0) ||
+                      ((selectedTab$ | async) === 'walk-in' && (visitorsForSelectedDate$ | async)?.length === 0) ||
+                      ((selectedTab$ | async) === 'pre-approved' && preApprovedForSelectedDate.length === 0)" 
+               class="flex flex-col items-center justify-center px-8 py-16 text-center">
+            <div class="mb-4 flex h-[88px] w-[88px] items-center justify-center rounded-full bg-green-50">
+              <ion-icon name="shield-checkmark-outline"></ion-icon>
             </div>
-          </ion-card-content>
-        </ion-card>
+            <h2 class="mb-2 font-extrabold text-slate-800">All Clear!</h2>
+            <p class="text-[14px] leading-6 text-slate-500">No visitor requests found for your flat.</p>
+
+          </div>
+
+          <!-- Bottom safe area padding spacer -->
+          <div style="padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 80px);"></div>
+        </div>
       </div>
 
       <ion-modal [isOpen]="isPreQrModalOpen" (didDismiss)="closePreQr()">
@@ -128,14 +152,6 @@ import { VisitCalendarComponent } from '../../../components/visit-calendar/visit
           </ion-content>
         </ng-template>
       </ion-modal>
-
-      <div *ngIf="(visitorsForSelectedDate$ | async)?.length === 0" class="flex flex-col items-center justify-center px-8 py-16 text-center">
-        <div class="mb-4 flex h-[88px] w-[88px] items-center justify-center rounded-full bg-green-50">
-          <ion-icon name="shield-checkmark-outline"></ion-icon>
-        </div>
-        <h2 class="mb-2 font-extrabold text-slate-800">All Clear!</h2>
-        <p class="text-[14px] leading-6 text-slate-500">No visitor requests found for your flat.</p>
-      </div>
 
       <ion-fab vertical="bottom" horizontal="end" slot="fixed">
         <ion-fab-button color="tertiary" (click)="onPreApprove()" class="fab-main">
@@ -185,8 +201,13 @@ export class ResidentDashboardPage implements OnInit {
   pendingCount = 0;
   selectedDate = this.toLocalIsoDate(new Date());
   private selectedDate$ = new BehaviorSubject<string>(this.selectedDate);
+  selectedTab$ = new BehaviorSubject<'all' | 'walk-in' | 'pre-approved'>('all');
   private currentSocietyId = '';
   private currentResidentId = '';
+
+  onTabChange(tab: 'all' | 'walk-in' | 'pre-approved') {
+    this.selectedTab$.next(tab);
+  }
   private authSubscription?: Subscription;
   private visitorsSubscription?: Subscription;
   private stopPreApprovedCreatedListener?: () => void;
@@ -214,12 +235,16 @@ export class ResidentDashboardPage implements OnInit {
           this.visitors$ = visitorsStream.pipe(
             map(list => [...list].sort((a, b) => this.getStatusPriority(a.status) - this.getStatusPriority(b.status)))
           );
-          this.visitorsForSelectedDate$ = combineLatest([this.visitors$, this.selectedDate$]).pipe(
-            map(([list, selectedDate]) =>
-              [...list]
-                .filter((v) => this.toLocalIsoDate(this.getVisitorDate(v)) === selectedDate)
-                .sort((a, b) => this.getVisitorDate(b).getTime() - this.getVisitorDate(a).getTime())
-            )
+          this.visitorsForSelectedDate$ = combineLatest([this.visitors$, this.selectedDate$, this.selectedTab$]).pipe(
+            map(([list, selectedDate, tab]) => {
+              let filtered = [...list].filter((v) => this.toLocalIsoDate(this.getVisitorDate(v)) === selectedDate);
+              if (tab === 'walk-in') {
+                filtered = filtered.filter(v => v.purpose !== 'Pre-Approved Guest');
+              } else if (tab === 'pre-approved') {
+                filtered = filtered.filter(v => v.purpose === 'Pre-Approved Guest');
+              }
+              return filtered.sort((a, b) => this.getVisitorDate(b).getTime() - this.getVisitorDate(a).getTime());
+            })
           );
           this.visitorsSubscription?.unsubscribe();
           this.visitorsSubscription = this.visitors$.subscribe(list => {
