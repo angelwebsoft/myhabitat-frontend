@@ -169,4 +169,8 @@ ion-input {
 ion-item {
     --inner-padding-end: 0;
     --background: transparent;
+
+    &::part(native) {
+        padding-left: 0;
+    }
 }
