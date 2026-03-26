@@ -16,57 +16,77 @@
     </ion-button>
   </div>
 
-  <div class="animate__animated animate__fadeIn">
-    <ion-list lines="inset" *ngIf="filteredUsers.length" class="bg-transparent">
-      <ion-item *ngFor="let u of filteredUsers" class="py-1">
-        <ion-avatar slot="start"
-          class="mr-3 flex items-center justify-center bg-[var(--ion-color-primary-light,#e0e7ff)] rounded-2xl">
-          <img class="h-full rounded-2xl" *ngIf="u.photoURL" [src]="u.photoURL" />
-          <div *ngIf="!u.photoURL" class="text-[1.2rem] font-extrabold text-[var(--ion-color-primary)]">
-            {{ u.userName.charAt(0) }}
-          </div>
-        </ion-avatar>
-        <ion-label class="min-w-0">
-          <h2 class="mb-1 truncate text-[15px] font-bold text-slate-800">{{ u.userName }}</h2>
-          <p class="my-0.5 flex items-center gap-1.5 truncate text-[12px] font-medium text-slate-500"
-            *ngIf="u.flatNumber">
-            <ion-icon name="business" class="text-slate-400"></ion-icon>
-            <span>Flat {{ u.flatNumber }}</span>
-          </p>
-          <p class="my-0.5 flex items-center gap-1.5 truncate text-[12px] font-medium text-slate-500">
-            <ion-icon name="call" class="text-slate-400"></ion-icon> {{ u.mobileNumber }}
-          </p>
-        </ion-label>
-        <div class="flex gap-1" slot="end">
-          <ion-button class="m-0" fill="clear" color="medium" (click)="openEdit(u); $event.stopPropagation()"
-            aria-label="Edit user">
-            <ion-icon class="text-[19px]" name="create-outline" slot="icon-only"></ion-icon>
-          </ion-button>
-          <ion-button class="m-0" fill="clear" color="danger" (click)="confirmDelete(u); $event.stopPropagation()"
-            aria-label="Delete user">
-            <ion-icon class="text-[19px]" name="trash-outline" slot="icon-only"></ion-icon>
-          </ion-button>
+  <div class="px-2 pt-4 bg-[#f8fafc] min-h-full pb-[100px]" *ngIf="filteredUsers.length">
+    <div *ngFor="let u of filteredUsers" class="mb-5">
+      <app-common-card customClass="m-0 border-0 shadow-lg shadow-slate-200/50">
+        <!-- Status Badge top right like the screenshot -->
+        <div slot="header-end"
+          class="rounded-full bg-[#fbbf24] px-[12px] py-[4px] text-[11px] font-bold text-black flex items-center gap-1.5 shadow-sm">
+          <div class="h-1.5 w-1.5 rounded-full bg-white"></div>
+          PENDING
         </div>
-      </ion-item>
-    </ion-list>
 
+        <div class="flex items-center gap-5 mt-[-10px] mb-6">
+          <ion-avatar class="h-[76px] w-[76px] shrink-0 bg-[#334155] rounded-full p-1 shadow-inner">
+            <img class="h-full rounded-full object-cover" *ngIf="u.photoURL" [src]="u.photoURL" />
+            <div *ngIf="!u.photoURL"
+              class="flex h-full w-full items-center justify-center text-[1.8rem] font-bold text-slate-300">
+              <ion-icon name="person"></ion-icon>
+            </div>
+          </ion-avatar>
+          <div class="min-w-0">
+            <h2 class="m-0 truncate text-[22px] font-extrabold text-slate-900 tracking-tight">{{ u.userName }}</h2>
+            <p class="mt-0.5 text-[15px] font-semibold text-slate-400 capitalize">{{ u.role }}</p>
+          </div>
+        </div>
 
-    <div class="flex flex-col items-center justify-center px-5 py-[50px] text-center text-[var(--ion-color-medium)]"
-      *ngIf="!filteredUsers.length && users.length">
-      <ion-icon name="search-outline" class="mb-4 text-[80px] opacity-30"></ion-icon>
-      <p>No users match your search.</p>
+        <div class="space-y-3 mb-2 ml-1">
+          <div class="flex items-center gap-3.5 text-[15px] text-slate-500 font-semibold" *ngIf="u.flatNumber">
+            <ion-icon name="home-outline" class="text-slate-400 text-[20px]"></ion-icon>
+            <span>Flat {{ u.flatNumber }}</span>
+          </div>
+          <div class="flex items-center gap-3.5 text-[15px] text-slate-500 font-semibold">
+            <ion-icon name="call-outline" class="text-slate-400 text-[20px]"></ion-icon>
+            <span>{{ u.mobileNumber }}</span>
+          </div>
+        </div>
+
+        <!-- Footer exactly matching the screenshot style -->
+        <div slot="footer" class="flex w-full items-center justify-between gap-4 py-2">
+          <button
+            class="flex items-center gap-2 px-4 py-3 text-[15px] font-black text-[#dc2626] bg-transparent border-0 active:scale-95 transition-transform"
+            (click)="confirmDelete(u); $event.stopPropagation()">
+            <ion-icon name="close-circle-outline" class="text-[22px]"></ion-icon>
+            DECLINE
+          </button>
+
+          <button
+            class="flex items-center gap-2 px-8 py-3.5 text-[15px] font-black text-black bg-[#22c55e] rounded-[22px] shadow-[0_10px_20px_-5px_rgba(34,197,94,0.3)] active:scale-95 transition-all"
+            (click)="openEdit(u); $event.stopPropagation()">
+            <ion-icon name="checkmark-circle-outline" class="text-[22px]"></ion-icon>
+            AUTHORIZE
+          </button>
+        </div>
+      </app-common-card>
     </div>
+  </div>
 
-    <div class="flex flex-col items-center justify-center px-5 py-[50px] text-center text-[var(--ion-color-medium)]"
-      *ngIf="!users.length">
-      <ion-icon name="people-outline" class="mb-4 text-[80px] opacity-30"></ion-icon>
-      <h2>No Users Yet</h2>
-      <p>Tap + to add your first user.</p>
-      <ion-button fill="clear" (click)="addDemoResidents()" *ngIf="activeRole === 'resident'">
-        <ion-icon name="flask-outline" slot="start"></ion-icon>
-        Seed Demo Residents
-      </ion-button>
-    </div>
+
+  <div class="flex flex-col items-center justify-center px-5 py-[50px] text-center text-[var(--ion-color-medium)]"
+    *ngIf="!filteredUsers.length && users.length">
+    <ion-icon name="search-outline" class="mb-4 text-[80px] opacity-30"></ion-icon>
+    <p>No users match your search.</p>
+  </div>
+
+  <div class="flex flex-col items-center justify-center px-5 py-[50px] text-center text-[var(--ion-color-medium)]"
+    *ngIf="!users.length">
+    <ion-icon name="people-outline" class="mb-4 text-[80px] opacity-30"></ion-icon>
+    <h2>No Users Yet</h2>
+    <p>Tap + to add your first user.</p>
+    <ion-button fill="clear" (click)="addDemoResidents()" *ngIf="activeRole === 'resident'">
+      <ion-icon name="flask-outline" slot="start"></ion-icon>
+      Seed Demo Residents
+    </ion-button>
   </div>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
@@ -94,81 +114,77 @@
         </ion-toolbar>
       </ion-header>
       <ion-content class="ion-padding">
-        <ion-card class="m-0 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.08)]">
-          <ion-card-content>
-            <div class="mb-5">
-              <ion-label
-                class="mb-1.5 ml-1 block text-[0.8rem] font-semibold text-[var(--ion-color-medium)]">Photo</ion-label>
-              <div class="flex items-center gap-3">
-                <ion-avatar class="h-14 w-14 bg-slate-100 relative">
-                  <div class="w-full h-full rounded-full">
-                    <img class="w-full h-full object-cover overflow-auto rounded-full" *ngIf="form.photoURL"
-                      [src]="form.photoURL" />
-                    <div *ngIf="!form.photoURL"
-                      class="flex h-full w-full items-center justify-center text-[var(--ion-color-medium)]">
-                      <ion-icon name="add" class="text-lg"></ion-icon>
-                    </div>
-                    <input class="absolute inset-0 flex items-center justify-center m-auto opacity-0" type="file"
-                      accept="image/*" (change)="onPhotoSelected($event, 'add')" />
+        <app-common-card customClass="m-0">
+          <div class="mb-5">
+            <ion-label
+              class="mb-1.5 ml-1 block text-[0.8rem] font-semibold text-[var(--ion-color-medium)]">Photo</ion-label>
+            <div class="flex items-center gap-3">
+              <ion-avatar class="h-14 w-14 bg-slate-100 relative">
+                <div class="w-full h-full rounded-full">
+                  <img class="w-full h-full object-cover overflow-auto rounded-full" *ngIf="form.photoURL"
+                    [src]="form.photoURL" />
+                  <div *ngIf="!form.photoURL"
+                    class="flex h-full w-full items-center justify-center text-[var(--ion-color-medium)]">
+                    <ion-icon name="add" class="text-lg"></ion-icon>
                   </div>
-                </ion-avatar>
-                <div class="flex-1">
-                  <p class="mt-1 text-[12px] text-[var(--ion-color-medium)]">PNG/JPG, will be compressed automatically.
-                  </p>
+                  <!-- <input class="absolute inset-0 flex items-center justify-center m-auto opacity-0" type="file" accept="image/*" (change)="onPhotoSelected($event, 'add')" /> -->
+                  <app-common-input class="absolute inset-0 flex items-center justify-center m-auto opacity-0"
+                    type="file" accept="image/*" (change)="onPhotoSelected($event, 'add')"> </app-common-input>
+
                 </div>
+              </ion-avatar>
+              <div class="flex-1">
+                <p class="mt-1 text-[12px] text-[var(--ion-color-medium)]">PNG/JPG, will be compressed automatically.
+                </p>
               </div>
             </div>
+          </div>
 
-            <div class="mb-4">
-              <ion-label class="mb-1.5 ml-1 block text-[0.8rem] font-semibold text-[var(--ion-color-medium)]">Full
-                Name</ion-label>
-              <div class="flex items-center rounded-[10px] bg-[#f4f5f8] px-3">
-                <ion-icon class="mr-4" name="person-outline"></ion-icon>
-                <ion-input class="flex-1" [(ngModel)]="form.userName" placeholder="John Doe"></ion-input>
-              </div>
+          <div class="mb-4">
+            <ion-label class="mb-1.5 ml-1 block text-[0.8rem] font-semibold text-[var(--ion-color-medium)]">Full
+              Name</ion-label>
+            <div class="flex items-center rounded-[10px] bg-[#f4f5f8] px-3">
+              <ion-icon class="mr-4" name="person-outline"></ion-icon>
+              <ion-input class="flex-1" [(ngModel)]="form.userName" placeholder="John Doe"></ion-input>
             </div>
+          </div>
 
-            <div class="mb-4">
-              <ion-label class="mb-1.5 ml-1 block text-[0.8rem] font-semibold text-[var(--ion-color-medium)]">Mobile
-                Number</ion-label>
-              <div class="flex items-center rounded-[10px] bg-[#f4f5f8] px-3">
-                <ion-icon class="mr-4" name="phone-portrait-outline"></ion-icon>
-                <ion-input class="flex-1" [(ngModel)]="form.mobileNumber" type="tel"
-                  placeholder="9876543210"></ion-input>
-              </div>
+          <div class="mb-4">
+            <ion-label class="mb-1.5 ml-1 block text-[0.8rem] font-semibold text-[var(--ion-color-medium)]">Mobile
+              Number</ion-label>
+            <div class="flex items-center rounded-[10px] bg-[#f4f5f8] px-3">
+              <ion-icon class="mr-4" name="phone-portrait-outline"></ion-icon>
+              <ion-input class="flex-1" [(ngModel)]="form.mobileNumber" type="tel" placeholder="9876543210"></ion-input>
             </div>
+          </div>
 
-            <div class="mb-4" *ngIf="activeRole === 'resident'">
-              <ion-label class="mb-1.5 ml-1 block text-[0.8rem] font-semibold text-[var(--ion-color-medium)]">Flat /
-                Unit Number</ion-label>
-              <app-common-select lines="none" iconName="home-outline" placeholder="Select flat"
-                [(ngModel)]="form.flatNumber" [options]="flatOptionsFormatted">
-              </app-common-select>
-            </div>
+          <div class="mb-4" *ngIf="activeRole === 'resident'">
+            <ion-label class="mb-1.5 ml-1 block text-[0.8rem] font-semibold text-[var(--ion-color-medium)]">Flat /
+              Unit Number</ion-label>
+            <app-common-select lines="none" iconName="home-outline" placeholder="Select flat"
+              [(ngModel)]="form.flatNumber" [options]="flatOptionsFormatted">
+            </app-common-select>
+          </div>
 
-            <ion-button expand="block" shape="round" class="h-12 font-semibold [--box-shadow:none]" (click)="addUser()"
-              [disabled]="!isValid()">
-              Save Changes
-            </ion-button>
-          </ion-card-content>
-        </ion-card>
+          <ion-button expand="block" shape="round" class="h-12 font-semibold [--box-shadow:none]" (click)="addUser()"
+            [disabled]="!isValid()">
+            Save Changes
+          </ion-button>
+        </app-common-card>
 
-        <ion-card class="mt-4 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.08)]" *ngIf="activeRole === 'resident'">
-          <ion-card-header>
-            <ion-card-title>Bulk Import</ion-card-title>
-            <ion-card-subtitle>Upload a JSON file containing multiple residents.</ion-card-subtitle>
-          </ion-card-header>
-          <ion-card-content>
-            <div>
-              <input type="file" id="fileImport" accept="application/json" (change)="onFileSelected($event)" hidden />
-              <label for="fileImport"
-                class="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 p-[30px] text-[var(--ion-color-medium)]">
-                <ion-icon name="cloud-upload-outline" class="mb-2.5 text-[40px]"></ion-icon>
-                <span>Click to select JSON file</span>
-              </label>
-            </div>
-          </ion-card-content>
-        </ion-card>
+        <app-common-card customClass="mt-4" cardTitle="Bulk Import"
+          cardSubtitle="Upload a JSON file containing multiple residents." *ngIf="activeRole === 'resident'">
+          <div>
+            <!-- <input type="file" id="fileImport" accept="application/json" (change)="onFileSelected($event)" hidden /> -->
+            <app-common-input type="file" id="fileImport" accept="application/json" (change)="onFileSelected($event)"
+              hidden> </app-common-input>
+            <label for="fileImport"
+              class="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 p-[30px] text-[var(--ion-color-medium)]">
+              <ion-icon name="cloud-upload-outline" class="mb-2.5 text-[40px]"></ion-icon>
+              <span>Click to select JSON file</span>
+            </label>
+          </div>
+        </app-common-card>
       </ion-content>
     </ng-template>
   </ion-modal>
@@ -190,63 +206,62 @@
         </ion-toolbar>
       </ion-header>
       <ion-content class="ion-padding">
-        <ion-card class="m-0 rounded-2xl shadow-[0_4px_12px_rgba(0,0,0,0.08)]">
-          <ion-card-content>
-            <div class="mb-5">
-              <ion-label
-                class="mb-1.5 ml-1 block text-[0.8rem] font-semibold text-[var(--ion-color-medium)]">Photo</ion-label>
-              <div class="flex items-center gap-3">
-                <ion-avatar class="h-14 w-14 bg-slate-100 relative">
-                  <img class="w-full h-full object-cover overflow-auto rounded-full" *ngIf="editForm.photoURL"
-                    [src]="editForm.photoURL" />
-                  <div *ngIf="!editForm.photoURL"
-                    class="flex h-full w-full items-center justify-center text-[var(--ion-color-medium)]">
-                    <ion-icon name="add" class="text-lg"></ion-icon>
-                  </div>
-                  <div class="absolute inset-0 h-[15px] w-[15px] flex items-center justify-center m-auto">
-                    <input class="absolute inset-0 flex items-center justify-center m-auto opacity-0" type="file"
-                      accept="image/*" (change)="onPhotoSelected($event, 'edit')" />
-                  </div>
-                </ion-avatar>
-                <div class="flex-1">
-                  <p class="mt-1 text-[12px] text-[var(--ion-color-medium)]">PNG/JPG, will be compressed automatically.
-                  </p>
+        <app-common-card customClass="m-0">
+          <div class="mb-5">
+            <ion-label
+              class="mb-1.5 ml-1 block text-[0.8rem] font-semibold text-[var(--ion-color-medium)]">Photo</ion-label>
+            <div class="flex items-center gap-3">
+              <ion-avatar class="h-14 w-14 bg-slate-100 relative">
+                <img class="w-full h-full object-cover overflow-auto rounded-full" *ngIf="editForm.photoURL"
+                  [src]="editForm.photoURL" />
+                <div *ngIf="!editForm.photoURL"
+                  class="flex h-full w-full items-center justify-center text-[var(--ion-color-medium)]">
+                  <ion-icon name="add" class="text-lg"></ion-icon>
                 </div>
+                <div class="absolute inset-0 h-[15px] w-[15px] flex items-center justify-center m-auto">
+                  <!-- <input class="absolute inset-0 flex items-center justify-center m-auto opacity-0" type="file"
+                      accept="image/*" (change)="onPhotoSelected($event, 'edit')" /> -->
+                  <app-common-input type="file" id="fileImport" accept="application/json"
+                    (change)="onFileSelected($event)" hidden> </app-common-input>
+                </div>
+              </ion-avatar>
+              <div class="flex-1">
+                <p class="mt-1 text-[12px] text-[var(--ion-color-medium)]">PNG/JPG, will be compressed automatically.
+                </p>
               </div>
             </div>
+          </div>
 
-            <div class="mb-4">
-              <ion-label class="mb-1.5 ml-1 block text-[0.8rem] font-semibold text-[var(--ion-color-medium)]">Full
-                Name</ion-label>
-              <div class="flex items-center rounded-[10px] bg-[#f4f5f8] px-3">
-                <ion-icon class="mr-4" name="person-outline"></ion-icon>
-                <ion-input class="flex-1" [(ngModel)]="editForm.userName"></ion-input>
-              </div>
+          <div class="mb-4">
+            <ion-label class="mb-1.5 ml-1 block text-[0.8rem] font-semibold text-[var(--ion-color-medium)]">Full
+              Name</ion-label>
+            <div class="flex items-center rounded-[10px] bg-[#f4f5f8] px-3">
+              <ion-icon class="mr-4" name="person-outline"></ion-icon>
+              <ion-input class="flex-1" [(ngModel)]="editForm.userName"></ion-input>
             </div>
+          </div>
 
-            <div class="mb-4">
-              <ion-label class="mb-1.5 ml-1 block text-[0.8rem] font-semibold text-[var(--ion-color-medium)]">Mobile
-                Number</ion-label>
-              <div class="flex items-center rounded-[10px] bg-[#f4f5f8] px-3">
-                <ion-icon class="mr-4" name="phone-portrait-outline"></ion-icon>
-                <ion-input class="flex-1" [(ngModel)]="editForm.mobileNumber" type="tel"></ion-input>
-              </div>
+          <div class="mb-4">
+            <ion-label class="mb-1.5 ml-1 block text-[0.8rem] font-semibold text-[var(--ion-color-medium)]">Mobile
+              Number</ion-label>
+            <div class="flex items-center rounded-[10px] bg-[#f4f5f8] px-3">
+              <ion-icon class="mr-4" name="phone-portrait-outline"></ion-icon>
+              <ion-input class="flex-1" [(ngModel)]="editForm.mobileNumber" type="tel"></ion-input>
             </div>
+          </div>
 
-            <div class="mb-4" *ngIf="editForm.role === 'resident'">
-              <ion-label class="mb-1.5 ml-1 block text-[0.8rem] font-semibold text-[var(--ion-color-medium)]">Flat /
-                Unit Number</ion-label>
-              <app-common-select lines="none" iconName="home-outline" placeholder="Select flat"
-                [(ngModel)]="editForm.flatNumber" [options]="flatOptionsFormatted">
-              </app-common-select>
-            </div>
+          <div class="mb-4" *ngIf="editForm.role === 'resident'">
+            <ion-label class="mb-1.5 ml-1 block text-[0.8rem] font-semibold text-[var(--ion-color-medium)]">Flat /
+              Unit Number</ion-label>
+            <app-common-select lines="none" iconName="home-outline" placeholder="Select flat"
+              [(ngModel)]="editForm.flatNumber" [options]="flatOptionsFormatted">
+            </app-common-select>
+          </div>
 
-            <ion-button expand="block" shape="round" class="h-12 font-semibold [--box-shadow:none]"
-              (click)="saveEdit()">
-              Save Changes
-            </ion-button>
-          </ion-card-content>
-        </ion-card>
+          <ion-button expand="block" shape="round" class="h-12 font-semibold [--box-shadow:none]" (click)="saveEdit()">
+            Save Changes
+          </ion-button>
+        </app-common-card>
 
       </ion-content>
     </ng-template>

@@ -1,0 +1,22 @@
+<div class="modern-card" [ngClass]="customClass">
+    <!-- Soft color indicator at the top if needed -->
+    <div *ngIf="color" class="color-indicator" [ngClass]="'bg-' + color"></div>
+
+    <div class="card-header" *ngIf="cardTitle || cardSubtitle">
+        <div class="title-group">
+            <h3 class="card-title" *ngIf="cardTitle">{{ cardTitle }}</h3>
+            <p class="card-subtitle" *ngIf="cardSubtitle">{{ cardSubtitle }}</p>
+        </div>
+        <ng-content select="[slot='header-end']"></ng-content>
+    </div>
+
+    <div class="card-body">
+        <ng-content></ng-content>
+    </div>
+
+    <!-- Clear footer divider and spacing like the image's buttons row -->
+    <div
+        class="card-footer flex items-center justify-between mt-6 pt-4 gap-3 bg-slate-50/10 -mx-6 px-6 -mb-6 border-t border-slate-50">
+        <ng-content select="[slot='footer']"></ng-content>
+    </div>
+</div>

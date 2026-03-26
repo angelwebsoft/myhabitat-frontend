@@ -1,80 +1,49 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, ToastController } from '@ionic/angular';
+import { IonicModule } from '@ionic/angular';
 import { Router } from '@angular/router';
-
+import { AppHeaderComponent } from '../../../components/app-header/app-header.component';
+import { CommonCardComponent } from '../../../components/common-card/common-card.component';
 import { DataService } from '../../../services/data.service';
 import { AuthService } from '../../../services/auth.service';
-import { Visitor } from '../../../models/visitor.model';
-import { AppHeaderComponent } from '../../../components/app-header/app-header.component';
-import { VisitCalendarComponent } from '../../../components/visit-calendar/visit-calendar.component';
+import { map, switchMap, from } from 'rxjs';
 
 @Component({
-  selector: 'app-admin-dashboard',
-  templateUrl: './dashboard.page.html',
-  standalone: true,
-  imports: [CommonModule, IonicModule, AppHeaderComponent, VisitCalendarComponent]
+   selector: 'app-admin-dashboard',
+   templateUrl: './dashboard.page.html',
+   standalone: true,
+   imports: [CommonModule, IonicModule, AppHeaderComponent, CommonCardComponent]
 })
 export class AdminDashboardPage implements OnInit {
-  visitors: Visitor[] = [];
-  totalVisits = 0;
-  activeVisitors = 0;
-  headerTitle = 'Admin Overview';
+   private router = inject(Router);
+   private dataService = inject(DataService);
+   private authService = inject(AuthService);
 
-  private dataService = inject(DataService);
-  private authService = inject(AuthService);
-  private router = inject(Router);
-  private toastCtrl = inject(ToastController);
+   currentUser$ = this.authService.currentUser$;
 
-  ngOnInit() {
-    this.authService.currentUser$.subscribe(async user => {
-      if (user) {
-        this.headerTitle = 'Admin Dashboard';
-        this.visitors = await this.dataService.getAllVisitors(user.societyId);
-        this.totalVisits = this.visitors.length;
-        this.activeVisitors = this.visitors.filter(v => v.status === 'checked-in').length;
-      }
-    });
-  }
+   stats$ = this.authService.currentUser$.pipe(
+      switchMap(user => {
+         if (!user) return from(Promise.resolve({ residents: 0, gatekeepers: 0, admins: 0 }));
 
-  manageResidents() {
-    this.router.navigate(['/admin/users/residents']);
-  }
+         return from(Promise.all([
+            this.dataService.getUsersBySocietyAndRole(user.societyId, 'resident'),
+            this.dataService.getUsersBySocietyAndRole(user.societyId, 'gatekeeper'),
+            this.dataService.getUsersBySocietyAndRole(user.societyId, 'admin')
+         ]).then(([res, gate, adm]) => ({
+            residents: res.length,
+            gatekeepers: gate.length,
+            admins: adm.length
+         })));
+      })
+   );
 
-  manageGatekeepers() {
-    this.router.navigate(['/admin/users/gatekeepers']);
-  }
+   ngOnInit() { }
 
-  manageAdmins() {
-    this.router.navigate(['/admin/users/admins']);
-  }
+   goTo(path: string) {
+      this.router.navigate([path]);
+   }
 
-  async exportCsv() {
-    if (this.visitors.length === 0) {
-      const toast = await this.toastCtrl.create({
-        message: 'No visitor data available to export.',
-        duration: 2000,
-        color: 'warning'
-      });
-      await toast.present();
-      return;
-    }
-
-    const headers = 'Visitor,Mobile,Flat,Status,Check-In,Check-Out\n';
-    const csvContent = this.visitors.map(v =>
-      `${v.visitorName},${v.mobile},${v.flatNumber},${v.status},${v.checkInTime},${v.checkOutTime}`
-    ).join('\n');
-
-    const blob = new Blob([headers + csvContent], { type: 'text/csv' });
-
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `visitor-logs-${new Date().toISOString()}.csv`;
-    a.click();
-  }
-
-  onLogout() {
-    this.authService.logout();
-  }
+   onLogout() {
+      this.authService.logout();
+   }
 }

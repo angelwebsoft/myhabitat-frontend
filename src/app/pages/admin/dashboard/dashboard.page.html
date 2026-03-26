@@ -1,57 +1,100 @@
-<app-header [title]="headerTitle" color="dark"></app-header>
+<ion-header class="ion-no-border">
+  <app-header title="Admin Management" color="primary"></app-header>
+</ion-header>
 
-<ion-content color="light">
-  <div class="rounded-b-[28px] bg-slate-900 px-4 pb-4 pt-5 text-white shadow-[0_8px_24px_rgba(15,23,42,0.18)]">
-    <p class="m-0 text-[13px] text-slate-300">Administration</p>
-    <h2 class="mt-1 text-[1.55rem] font-bold text-white">Society Overview</h2>
-  </div>
-
-  <div class="px-4 pb-5 pt-4">
-    <div class="space-y-4">
-      <div class="grid grid-cols-1 gap-4">
-        <ion-card color="light" class="m-0 rounded-[18px] shadow-[0_6px_18px_rgba(15,23,42,0.06)]">
-          <ion-card-header>
-            <ion-card-subtitle>Total Visits</ion-card-subtitle>
-            <ion-card-title>{{ totalVisits }}</ion-card-title>
-          </ion-card-header>
-        </ion-card>
-        <ion-card color="light" class="m-0 rounded-[18px] shadow-[0_6px_18px_rgba(15,23,42,0.06)]">
-          <ion-card-header>
-            <ion-card-subtitle>Active Visitors</ion-card-subtitle>
-            <ion-card-title>{{ activeVisitors }}</ion-card-title>
-          </ion-card-header>
-        </ion-card>
+<ion-content class="bg-slate-50">
+  <!-- Top rounded panel like Gatekeeper -->
+  <div
+    class="rounded-b-[32px] bg-white px-5 pb-8 pt-5 shadow-[0_4px_20px_rgba(15,23,42,0.06)] border-b border-slate-100"
+    *ngIf="currentUser$ | async as user">
+    <!-- Top row: Profile & Logout -->
+    <div class="flex items-center justify-between gap-2">
+      <div class="flex items-center gap-3">
+        <div
+          class="h-12 w-12 rounded-[16px] border-2 border-emerald-100 p-0.5 shadow-sm overflow-hidden shrink-0 bg-slate-50">
+          <img class="h-full w-full rounded-[14px] object-cover"
+            [src]="user.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg'" />
+        </div>
+        <div class="min-w-0">
+          <h2 class="truncate text-[15px] font-black text-slate-900 leading-tight m-0 uppercase tracking-tight">{{
+            user.userName }}</h2>
+          <p class="text-[11px] font-bold text-slate-400 m-0 uppercase tracking-widest mt-0.5">ADMINISTRATOR</p>
+        </div>
       </div>
 
-      <ion-list class="overflow-hidden rounded-[18px] border border-slate-200 bg-white">
-        <ion-list-header class="border-b border-slate-100 bg-slate-50/80">
-          <ion-label>Quick Actions</ion-label>
-        </ion-list-header>
-        <ion-item button (click)="exportCsv()" class="min-h-14">
-          <ion-icon name="download-outline" slot="start"></ion-icon>
-          <ion-label>Export Visitor Logs (CSV)</ion-label>
-        </ion-item>
-        <ion-item button (click)="manageResidents()" class="min-h-14">
-          <ion-icon name="people-outline" slot="start"></ion-icon>
-          <ion-label>Manage Residents</ion-label>
-        </ion-item>
-        <ion-item button (click)="manageGatekeepers()" class="min-h-14">
-          <ion-icon name="shield-checkmark-outline" slot="start"></ion-icon>
-          <ion-label>Manage Gatekeepers</ion-label>
-        </ion-item>
-        <ion-item button (click)="manageAdmins()" class="min-h-14">
-          <ion-icon name="person-outline" slot="start"></ion-icon>
-          <ion-label>Manage Admins</ion-label>
-        </ion-item>
-      </ion-list>
+      <!-- Header Action Capsule -->
+      <button (click)="onLogout()"
+        class="h-11 px-4 flex items-center gap-2 bg-slate-50 text-slate-500 rounded-2xl active:scale-95 transition-all outline-none border-0 group">
+        <ion-icon name="log-out" class="text-xl"></ion-icon>
+        <span class="text-[12px] font-black uppercase tracking-wider">EXIT</span>
+      </button>
+    </div>
 
-      <div class="pt-4">
-        <visit-calendar
-          [visitors]="visitors"
-          title="Visits Calendar"
-          subtitle="All society visits (date-wise)"
-          emptyText="No visits found for this date."
-        ></visit-calendar>
+    <!-- Overview Header -->
+    <div class="mt-8 px-1">
+      <h1 class="text-[26px] font-black text-slate-900 leading-none m-0">Performance Overview</h1>
+      <p class="text-[14px] font-bold text-slate-400 m-0 mt-2 uppercase tracking-wide italic">Society metrics and
+        operations</p>
+    </div>
+  </div>
+
+  <!-- Stats & Management -->
+  <div class="px-6 pt-8 pb-32 animate__animated animate__fadeIn">
+    <!-- Stats Row -->
+    <div class="grid grid-cols-2 gap-4 mb-8">
+      <div class="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100/60">
+        <div class="flex flex-col gap-1">
+          <div class="h-10 w-10 rounded-2xl bg-emerald-50 flex items-center justify-center mb-1">
+            <ion-icon name="people" class="text-xl text-emerald-500"></ion-icon>
+          </div>
+          <span class="text-[11px] font-black text-slate-400 uppercase tracking-widest">RESIDENTS</span>
+          <span class="text-[28px] font-black text-slate-900 leading-none mt-1">{{ (stats$ | async)?.residents || 0
+            }}</span>
+        </div>
+      </div>
+      <div class="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100/60">
+        <div class="flex flex-col gap-1">
+          <div class="h-10 w-10 rounded-2xl bg-amber-50 flex items-center justify-center mb-1">
+            <ion-icon name="shield-checkmark" class="text-xl text-amber-500"></ion-icon>
+          </div>
+          <span class="text-[11px] font-black text-slate-400 uppercase tracking-widest">STAFF</span>
+          <span class="text-[28px] font-black text-slate-900 leading-none mt-1">{{ (stats$ | async)?.gatekeepers || 0
+            }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Management Sections -->
+    <div class="mb-4">
+      <h3 class="text-[14px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-4">Management</h3>
+      <div class="space-y-4">
+        <button (click)="goTo('admin/users/residents')"
+          class="w-full flex items-center justify-between p-5 bg-white rounded-[24px] border border-slate-100 shadow-sm active:scale-98 transition-all">
+          <div class="flex items-center gap-4">
+            <div class="h-12 w-12 rounded-[16px] bg-indigo-50 flex items-center justify-center">
+              <ion-icon name="people" class="text-[24px] text-indigo-500"></ion-icon>
+            </div>
+            <div class="text-left">
+              <h3 class="text-[17px] font-black text-slate-800 m-0">Directory</h3>
+              <p class="text-[12px] font-bold text-slate-400 m-0">Manage all society residents</p>
+            </div>
+          </div>
+          <ion-icon name="chevron-forward" class="text-slate-300"></ion-icon>
+        </button>
+
+        <button (click)="goTo('admin/users/gatekeepers')"
+          class="w-full flex items-center justify-between p-5 bg-white rounded-[24px] border border-slate-100 shadow-sm active:scale-98 transition-all">
+          <div class="flex items-center gap-4">
+            <div class="h-12 w-12 rounded-[16px] bg-orange-50 flex items-center justify-center">
+              <ion-icon name="shield-half" class="text-[24px] text-orange-500"></ion-icon>
+            </div>
+            <div class="text-left">
+              <h3 class="text-[17px] font-black text-slate-800 m-0">Security</h3>
+              <p class="text-[12px] font-bold text-slate-400 m-0">Manage gatekeeper list</p>
+            </div>
+          </div>
+          <ion-icon name="chevron-forward" class="text-slate-300"></ion-icon>
+        </button>
       </div>
     </div>
   </div>

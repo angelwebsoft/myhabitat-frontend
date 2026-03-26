@@ -8,6 +8,8 @@ import { User } from '../../../models/visitor.model';
 import { ActivatedRoute } from '@angular/router';
 import { AppHeaderComponent } from '../../../components/app-header/app-header.component';
 import { CommonSelectComponent } from '../../../components/common-select/common-select.component';
+import { CommonInputComponent } from '../../../components/common-input/common-input.component';
+import { CommonCardComponent } from '../../../components/common-card/common-card.component';
 
 @Component({
   selector: 'app-admin-residents',
@@ -35,7 +37,7 @@ import { CommonSelectComponent } from '../../../components/common-select/common-
     }
   `],
 
-  imports: [CommonModule, FormsModule, IonicModule, AppHeaderComponent, CommonSelectComponent]
+  imports: [CommonModule, FormsModule, IonicModule, AppHeaderComponent, CommonSelectComponent, CommonInputComponent, CommonCardComponent]
 })
 export class AdminResidentsPage implements OnInit {
   @ViewChild('addModal') addModal?: IonModal;

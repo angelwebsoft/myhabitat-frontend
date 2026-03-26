@@ -12,6 +12,7 @@ import { VisitCalendarComponent } from '../../../components/visit-calendar/visit
 import { FormsModule } from '@angular/forms';
 import { CommonInputComponent } from '../../../components/common-input/common-input.component';
 import { CommonButtonComponent } from 'src/app/components/common-button/common-button.component';
+import { CommonCardComponent } from '../../../components/common-card/common-card.component';
 
 @Component({
   selector: 'app-gatekeeper-dashboard',
@@ -77,41 +78,64 @@ import { CommonButtonComponent } from 'src/app/components/common-button/common-b
           (tabChange)="onTabChange($event)"
         ></visit-calendar>
 
-        <div class="pt-3">
-        <div *ngFor="let visitor of visitorsForSelectedDate$ | async" class="mb-3 overflow-hidden rounded-[18px] shadow-[0_6px_18px_rgba(15,23,42,0.06)] bg-white">
-          <div class="p-3.5">
-            <div class="flex items-start gap-3">
-              <ion-avatar class="h-11 w-11 shrink-0">
-                <img class="h-full" [src]="visitor.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg'" />
-              </ion-avatar>
+        <div class="space-y-4 pt-3">
+          <div *ngFor="let visitor of visitorsForSelectedDate$ | async" class="animate__animated animate__fadeInUp">
+            <app-common-card customClass="m-0" [color]="getStatusColor(visitor.status)">
+              <div slot="header-end" class="rounded-full px-3 py-1 text-[11px] font-bold flex items-center gap-1.5" [ngClass]="{
+                'bg-yellow-100 text-yellow-600': visitor.status === 'pending',
+                'bg-green-100 text-green-600': visitor.status === 'approved',
+                'bg-blue-100 text-blue-600': visitor.status === 'checked-in',
+                'bg-red-100 text-red-600': visitor.status === 'rejected',
+                'bg-gray-100 text-gray-600': visitor.status === 'checked-out'
+              }">
+                <div class="h-1.5 w-1.5 rounded-full" [ngClass]="{
+                  'bg-yellow-500': visitor.status === 'pending',
+                  'bg-green-500': visitor.status === 'approved',
+                  'bg-blue-500': visitor.status === 'checked-in',
+                  'bg-red-500': visitor.status === 'rejected',
+                  'bg-gray-500': visitor.status === 'checked-out'
+                }"></div>
+                {{ getStatusLabel(visitor.status) }}
+              </div>
 
-              <div class="min-w-0 flex-1">
-                <div class="flex items-start justify-between gap-2">
-                  <div class="min-w-0">
-                    <h2 class="truncate text-[15px] font-semibold text-slate-800">{{ visitor.visitorName }}</h2>
-                    <p class="truncate text-[13px] text-slate-500">Flat {{ visitor.flatNumber }}<span *ngIf="visitor.purpose"> • {{ visitor.purpose }}</span></p>
-                    <p class="mt-1 truncate text-[12px] text-slate-400">{{ visitor.createdAt | date:'short' }}</p>
-                  </div>
-                  <ion-badge [color]="getStatusColor(visitor.status)" class="shrink-0 rounded-md px-2 py-1 text-[10px] font-semibold">
-                    {{ getStatusLabel(visitor.status) }}
-                  </ion-badge>
+              <div class="flex items-center gap-4 mb-4">
+                <ion-avatar class="h-[52px] w-[52px] shrink-0 bg-slate-100 rounded-[16px]">
+                  <img class="h-full rounded-[16px]" [src]="visitor.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg'" />
+                </ion-avatar>
+                <div class="min-w-0">
+                  <h2 class="m-0 truncate text-[17px] font-bold text-slate-800">{{ visitor.visitorName }}</h2>
+                  <p class="mt-0.5 text-[13px] font-medium text-slate-400">Flat {{ visitor.flatNumber }}<span *ngIf="visitor.purpose"> • {{ visitor.purpose }}</span></p>
                 </div>
               </div>
-            </div>
 
-            <div class="mt-3" *ngIf="visitor.status === 'approved'">
-              <ion-button expand="block" color="success" class="h-10 text-[13px] font-semibold [--border-radius:12px]" (click)="onCheckIn(visitor.id)">
-                Check In
-              </ion-button>
-            </div>
+              <div class="flex items-center gap-6 text-[13px] text-slate-500 font-medium">
+                <div class="flex items-center gap-2">
+                  <ion-icon name="time-outline" class="text-slate-400 text-lg"></ion-icon>
+                  {{ visitor.createdAt | date:'shortTime' }}
+                </div>
+                <div class="flex items-center gap-2" *ngIf="visitor.mobile">
+                  <ion-icon name="call-outline" class="text-slate-400 text-lg"></ion-icon>
+                  {{ visitor.mobile }}
+                </div>
+              </div>
 
-            <div class="mt-3" *ngIf="visitor.status === 'checked-in'">
-              <ion-button expand="block" color="danger" class="h-10 text-[13px] font-semibold [--border-radius:12px]" (click)="onCheckOut(visitor.id)">
-                Check Out
-              </ion-button>
-            </div>
+              <div slot="footer" class="w-full mt-4" *ngIf="visitor.status === 'approved' || visitor.status === 'checked-in'">
+                <button *ngIf="visitor.status === 'approved'" 
+                  class="w-full flex items-center justify-center gap-2 px-6 py-3 text-[14px] font-bold text-white bg-green-500 rounded-2xl shadow-lg shadow-green-500/20 active:scale-[0.98] transition-all" 
+                  (click)="onCheckIn(visitor.id)">
+                  <ion-icon name="checkmark-circle-outline" class="text-xl"></ion-icon>
+                  CHECK IN VISITOR
+                </button>
+
+                <button *ngIf="visitor.status === 'checked-in'" 
+                  class="w-full flex items-center justify-center gap-2 px-6 py-3 text-[14px] font-bold text-white bg-red-500 rounded-2xl shadow-lg shadow-red-500/20 active:scale-[0.98] transition-all" 
+                  (click)="onCheckOut(visitor.id)">
+                  <ion-icon name="log-out-outline" class="text-xl"></ion-icon>
+                  CHECK OUT VISITOR
+                </button>
+              </div>
+            </app-common-card>
           </div>
-        </div>
         </div>
 
         <div *ngIf="(visitorsForSelectedDate$ | async)?.length === 0" class="px-5 py-10 text-center text-slate-400">
@@ -130,7 +154,7 @@ import { CommonButtonComponent } from 'src/app/components/common-button/common-b
     </ion-button>
   `,
   standalone: true,
-  imports: [CommonModule, IonicModule, AppHeaderComponent, VisitCalendarComponent, CommonInputComponent, FormsModule, CommonButtonComponent]
+  imports: [CommonModule, IonicModule, AppHeaderComponent, VisitCalendarComponent, CommonInputComponent, FormsModule, CommonButtonComponent, CommonCardComponent]
 })
 export class GatekeeperDashboardPage implements OnInit {
   visitors$: Observable<Visitor[]> = of([]);

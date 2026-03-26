@@ -13,25 +13,25 @@ import { CommonButtonComponent } from '../common-button/common-button.component'
   styles: [],
   template: `
   
-    <div class="-ml-5 -mr-5 sticky top-0 z-10">
-  <div class="m-0 overflow-hidden bg-white p-3.5 shadow-[0_6px_20px_rgba(15,23,42,0.04)] relative ">
+    <div class="-ml-6 -mr-6 sticky top-0 z-10">
+  <div class="m-0 overflow-hidden bg-white p-5  relative ">
     <div class="flex items-center justify-between">
       <!-- Left: Calendar Icon + Date labels -->
-      <div class="flex items-center gap-3">
-        <div class="flex h-11 w-11 items-center justify-center rounded-[14px] " style="background: var(--ion-color-primary-rgb);">
-          <ion-icon color="primary" name="calendar-clear" class="text-[22px]"></ion-icon>
+      <div class="flex items-center gap-4">
+        <div class="flex h-12 w-12 items-center justify-center rounded-[18px] bg-primary-light">
+          <ion-icon class="text-[24px] text-primary" name="calendar-clear"></ion-icon>
         </div>
         <div>
-          <p class="text-[11px] font-medium text-slate-400 uppercase tracking-wide m-0 mb-1">Selected Date</p>
-          <h3 class="text-[15px] font-semibold text-slate-800 leading-tight m-0">{{ selectedDateLabel }}</h3>
+          <p class="text-[12px] font-bold text-slate-400 uppercase tracking-widest m-0 mb-1">Selected Date</p>
+          <h3 class="text-[16px] font-black text-slate-800 leading-tight m-0">{{ selectedDateLabel }}</h3>
         </div>
       </div>
       <!-- Right: Badge / Indicator -->
-      <div class="flex items-center gap-1.5" >
-        <div class="rounded-full bg-slate-50 px-3 py-1.5 text-[11px] font-bold" style="background: var(--ion-color-primary-rgb); color: var(--ion-color-primary);">
+      <div class="flex items-center gap-2" >
+        <div class="rounded-full bg-primary-light px-4 py-2 text-[12px] font-black text-primary" >
           {{ filteredVisitors.length }} {{ filteredVisitors.length === 1 ? 'Visit' : 'Visits' }}
         </div>
-        <ion-icon name="chevron-down" class="text-slate-400 text-[15px]"></ion-icon>
+        <ion-icon name="chevron-down" class="text-slate-300 text-[18px] mt-0.5"></ion-icon>
       </div>
     </div>
     <!-- absolute click triggering layer for modal sheet -->
@@ -40,9 +40,9 @@ import { CommonButtonComponent } from '../common-button/common-button.component'
 
   <ion-modal [isOpen]="isCalendarOpen" (didDismiss)="isCalendarOpen = false" [breakpoints]="[0, 0.54]" [initialBreakpoint]="0.54" class="custom-sheet-modal">
     <ng-template>
-      <div class="px-5 py-4 bg-white border-b border-slate-100/80 flex items-center justify-between">
-        <h2 class="m-0 text-[16px] font-bold text-slate-800">Select Date</h2>
-        <button (click)="isCalendarOpen = false" class="m-0 p-0 hover:opacity-75 text-[14px] font-extrabold text-[var(--ion-color-primary)] bg-transparent border-0 cursor-pointer">DONE</button>
+      <div class="px-5 py-5 bg-white border-b border-slate-100 flex items-center justify-between">
+        <h2 class="m-0 text-[18px] font-black text-slate-900">Select Date</h2>
+        <button (click)="isCalendarOpen = false" class="m-0 p-0 hover:opacity-75 text-[15px] font-black text-indigo-600 bg-transparent border-0 cursor-pointer">DONE</button>
       </div>
 
       <ion-content class="ion-padding" color="light">
@@ -57,62 +57,48 @@ import { CommonButtonComponent } from '../common-button/common-button.component'
       </ion-content>
     </ng-template>
   </ion-modal>
-  <div class="px-4 flex gap-1.5 mb-2 bg-white py-2 items-center text-center">
-    <app-common-button 
-      label="All" 
-      (btnClick)="changeTab('all')" 
-      class="flex-1" 
-      size="small"
-      [color]="selectedTab === 'all' ? 'primary' : 'medium'" 
-      [fill]="selectedTab === 'all' ? 'solid' : 'clear'" 
-      customClass="font-extrabold text-[12px] h-[34px] rounded-xl"
-    ></app-common-button>
-
-    <app-common-button 
-      label="Walk-In" 
-      (btnClick)="changeTab('walk-in')" 
-      class="flex-1" 
-      size="small"
-      [color]="selectedTab === 'walk-in' ? 'primary' : 'medium'" 
-      [fill]="selectedTab === 'walk-in' ? 'solid' : 'clear'" 
-      customClass="font-extrabold text-[11px] h-[34px] rounded-xl"
-    ></app-common-button>
-
-    <app-common-button 
-      label="Pre-Approved" 
-      (btnClick)="changeTab('pre-approved')" 
-      class="flex-1" 
-      size="small"
-      [color]="selectedTab === 'pre-approved' ? 'primary' : 'medium'" 
-      [fill]="selectedTab === 'pre-approved' ? 'solid' : 'clear'" 
-      customClass="font-extrabold text-[11px] h-[34px] rounded-xl"
-    ></app-common-button>
+  <div class="px-6 flex gap-3 mb-4 bg-white py-3 items-center">
+    <button 
+      *ngFor="let tab of tabs"
+      (click)="changeTab(tab.value)" 
+      class="flex-1 px-4 py-3 rounded-2xl text-[13px] font-black transition-all border-0 cursor-pointer"
+      [ngClass]="selectedTab === tab.value ? 'bg-primary text-white shadow-lg shadow-indigo-500/30' : 'bg-primary-light capitalize'"
+    >
+      {{ tab.label }}
+    </button>
   </div>
 </div>
 <ng-container *ngIf="showList">
-  <ion-list class="mt-1 overflow-hidden rounded-[14px] border border-slate-200 bg-white" *ngIf="filteredVisitors.length > 0; else empty">
-    <ion-item *ngFor="let v of filteredVisitors" lines="full" class="min-h-14">
-      <ion-label class="min-w-0">
-        <div class="flex items-center justify-between gap-2">
-          <div class="min-w-0">
-            <div class="truncate text-[14px] font-bold text-slate-800">{{ v.visitorName }}</div>
-            <div class="truncate text-[12px] text-slate-500"> Flat {{ v.flatNumber }} • {{ v.mobile }}
-              <span *ngIf="v.purpose" class="text-slate-400"> ({{ v.purpose }})</span>
-            </div>
-            <div class="mt-0.5 text-[11px] text-slate-400">{{ getVisitorDate(v) | date:'shortTime' }}</div>
-          </div>
-          <ion-badge [color]="getStatusColor(v.status)" class="shrink-0 rounded-md px-2 py-1 text-[10px] font-semibold">
-            {{ getStatusLabel(v.status) }}
-          </ion-badge>
+  <div class="px-6 space-y-4 pb-10">
+    <div *ngFor="let v of filteredVisitors" class="flex items-center justify-between p-5 bg-white rounded-[24px] border border-slate-100 shadow-sm animate__animated animate__fadeInUp">
+      <div class="flex items-center gap-4">
+        <div class="h-12 w-12 rounded-2xl bg-slate-50 flex items-center justify-center">
+           <ion-icon name="person" class="text-slate-300 text-xl"></ion-icon>
         </div>
-      </ion-label>
-    </ion-item>
-  </ion-list>
-  <ng-template #empty>
-    <div class="px-4 py-8 text-center text-slate-400">
-      <div class="text-[13px]">{{ emptyText }}</div>
+        <div class="min-w-0">
+          <h3 class="m-0 text-[15px] font-black text-slate-800 truncate">{{ v.visitorName }}</h3>
+          <p class="m-0 mt-0.5 text-[12px] font-bold text-slate-400">FLAT {{ v.flatNumber }} • {{ getVisitorDate(v) | date:'shortTime' }}</p>
+        </div>
+      </div>
+      <div class="flex shrink-0">
+          <span class="px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider" [ngClass]="{
+            'bg-amber-100 text-amber-600': v.status === 'pending',
+            'bg-emerald-100 text-emerald-600': v.status === 'approved' || v.status === 'checked-in',
+            'bg-rose-100 text-rose-600': v.status === 'rejected',
+            'bg-slate-100 text-slate-500': v.status === 'checked-out'
+          }">
+            {{ v.status === 'checked-in' ? 'Inside' : (v.status === 'checked-out' ? 'Completed' : v.status) }}
+          </span>
+      </div>
     </div>
-  </ng-template>
+    
+    <div *ngIf="filteredVisitors.length === 0" class="py-12 text-center">
+        <div class="h-20 w-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+           <ion-icon name="document-text-outline" class="text-3xl text-slate-200"></ion-icon>
+        </div>
+        <p class="text-[14px] font-bold text-slate-400">{{ emptyText }}</p>
+    </div>
+  </div>
 </ng-container>
   `
 })
@@ -133,6 +119,11 @@ export class VisitCalendarComponent implements OnChanges {
   isCalendarOpen = false;
   readonly triggerId = `visit-cal-trigger-${Math.random().toString(36).slice(2)}`;
   selectedTab: 'all' | 'walk-in' | 'pre-approved' = 'all';
+  tabs: { label: string; value: 'all' | 'walk-in' | 'pre-approved' }[] = [
+    { label: 'All', value: 'all' },
+    { label: 'Walk-In', value: 'walk-in' },
+    { label: 'Pre-Approved', value: 'pre-approved' }
+  ];
 
 
 
