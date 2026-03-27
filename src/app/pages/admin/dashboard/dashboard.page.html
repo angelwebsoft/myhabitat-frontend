@@ -2,47 +2,17 @@
   <app-header title="Admin Management" color="primary"></app-header>
 </ion-header>
 
-<ion-content class="bg-slate-50">
-  <!-- Top rounded panel like Gatekeeper -->
-  <div
-    class="rounded-b-[32px] bg-white px-5 pb-8 pt-5 shadow-[0_4px_20px_rgba(15,23,42,0.06)] border-b border-slate-100"
-    *ngIf="currentUser$ | async as user">
-    <!-- Top row: Profile & Logout -->
-    <div class="flex items-center justify-between gap-2">
-      <div class="flex items-center gap-3">
-        <div
-          class="h-12 w-12 rounded-[16px] border-2 border-emerald-100 p-0.5 shadow-sm overflow-hidden shrink-0 bg-slate-50">
-          <img class="h-full w-full rounded-[14px] object-cover"
-            [src]="user.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg'" />
-        </div>
-        <div class="min-w-0">
-          <h2 class="truncate text-[15px] font-black text-slate-900 leading-tight m-0 uppercase tracking-tight">{{
-            user.userName }}</h2>
-          <p class="text-[11px] font-bold text-slate-400 m-0 uppercase tracking-widest mt-0.5">ADMINISTRATOR</p>
-        </div>
-      </div>
-
-      <!-- Header Action Capsule -->
-      <button (click)="onLogout()"
-        class="h-11 px-4 flex items-center gap-2 bg-slate-50 text-slate-500 rounded-2xl active:scale-95 transition-all outline-none border-0 group">
-        <ion-icon name="log-out" class="text-xl"></ion-icon>
-        <span class="text-[12px] font-black uppercase tracking-wider">EXIT</span>
-      </button>
-    </div>
-
-    <!-- Overview Header -->
-    <div class="mt-8 px-1">
-      <h1 class="text-[26px] font-black text-slate-900 leading-none m-0">Performance Overview</h1>
-      <p class="text-[14px] font-bold text-slate-400 m-0 mt-2 uppercase tracking-wide italic">Society metrics and
-        operations</p>
-    </div>
-  </div>
+<ion-content [style.--background]="'var(--ion-color-primary-light)'">
+  <!-- Common Dashboard Header -->
+  <app-dashboard-header [user]="(currentUser$ | async) ?? null" role="admin" actionIcon="log-out" label="EXIT"
+    welcomeSubtitle="Society metrics and administrator tools" searchPlaceholder="Search residents or staff..."
+    (action)="onLogout()"></app-dashboard-header>
 
   <!-- Stats & Management -->
   <div class="px-6 pt-8 pb-32 animate__animated animate__fadeIn">
     <!-- Stats Row -->
     <div class="grid grid-cols-2 gap-4 mb-8">
-      <div class="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100/60">
+      <div class="bg-slate-50 rounded-[28px] p-5 shadow-sm border border-slate-100/60">
         <div class="flex flex-col gap-1">
           <div class="h-10 w-10 rounded-2xl bg-emerald-50 flex items-center justify-center mb-1">
             <ion-icon name="people" class="text-xl text-emerald-500"></ion-icon>
@@ -52,7 +22,7 @@
             }}</span>
         </div>
       </div>
-      <div class="bg-white rounded-[28px] p-5 shadow-sm border border-slate-100/60">
+      <div class="bg-slate-50 rounded-[28px] p-5 shadow-sm border border-slate-100/60">
         <div class="flex flex-col gap-1">
           <div class="h-10 w-10 rounded-2xl bg-amber-50 flex items-center justify-center mb-1">
             <ion-icon name="shield-checkmark" class="text-xl text-amber-500"></ion-icon>
@@ -69,7 +39,7 @@
       <h3 class="text-[14px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-4">Management</h3>
       <div class="space-y-4">
         <button (click)="goTo('admin/users/residents')"
-          class="w-full flex items-center justify-between p-5 bg-white rounded-[24px] border border-slate-100 shadow-sm active:scale-98 transition-all">
+          class="w-full h-20 flex items-center justify-between p-5 bg-white rounded-[24px] border border-slate-100 shadow-sm active:scale-98 transition-all">
           <div class="flex items-center gap-4">
             <div class="h-12 w-12 rounded-[16px] bg-indigo-50 flex items-center justify-center">
               <ion-icon name="people" class="text-[24px] text-indigo-500"></ion-icon>
@@ -83,7 +53,7 @@
         </button>
 
         <button (click)="goTo('admin/users/gatekeepers')"
-          class="w-full flex items-center justify-between p-5 bg-white rounded-[24px] border border-slate-100 shadow-sm active:scale-98 transition-all">
+          class="w-full h-20 flex items-center justify-between p-5 bg-white rounded-[24px] border border-slate-100 shadow-sm active:scale-98 transition-all">
           <div class="flex items-center gap-4">
             <div class="h-12 w-12 rounded-[16px] bg-orange-50 flex items-center justify-center">
               <ion-icon name="shield-half" class="text-[24px] text-orange-500"></ion-icon>

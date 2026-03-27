@@ -1,59 +1,16 @@
 <ion-header class="ion-no-border">
-    <app-header title="Resident Dashboard" color="tertiary" [showMenuButton]="true"></app-header>
+    <app-header title="Resident Home" color="tertiary" [showMenuButton]="true"></app-header>
 </ion-header>
 
-<ion-content class="bg-white">
-    <div class="rounded-b-[32px] bg-white px-5 pb-8 pt-5 shadow-[0_4px_20px_rgba(15,23,42,0.06)] border-b border-slate-100"
-        *ngIf="currentUser$ | async as user">
-        <!-- Top row -->
-        <div class="flex items-center justify-between gap-2">
-            <div class="flex items-center gap-3">
-                <div
-                    class="h-12 w-12 rounded-[16px] border-2 border-indigo-100 p-0.5 shadow-sm overflow-hidden shrink-0 bg-slate-50">
-                    <img class="h-full w-full rounded-[14px] object-cover"
-                        [src]="user.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg'" />
-                </div>
-                <div class="min-w-0">
-                    <h2
-                        class="truncate text-[15px] font-black text-slate-900 leading-tight m-0 uppercase tracking-tight">
-                        {{ user.userName }}</h2>
-                    <p class="text-[11px] font-bold text-slate-400 m-0 uppercase tracking-widest mt-0.5">FLAT {{
-                        user.flatNumber }}</p>
-                </div>
-            </div>
-
-            <!-- Pre-Approve Capsule (Same style as gatekeeper scan button) -->
-            <button (click)="onPreApprove()"
-                class="h-11 px-4 flex items-center gap-2 bg-indigo-500 text-white rounded-2xl shadow-lg shadow-indigo-500/20 active:scale-95 transition-all outline-none border-0 group">
-                <ion-icon name="add" class="text-xl"></ion-icon>
-                <span class="text-[12px] font-black uppercase tracking-wider">ADD GUEST</span>
-            </button>
-        </div>
-
-        <!-- Greeting -->
-        <div class="mt-8 px-1">
-            <h1 class="text-[26px] font-black text-slate-900 leading-none m-0">Welcome, {{ user.userName ?
-                user.userName.split(' ')[0] : 'Resident' }}</h1>
-            <p class="text-[14px] font-bold text-slate-400 m-0 mt-2">Manage your home access and visitors</p>
-        </div>
-
-        <!-- Search input matching gatekeeper exactly -->
-        <div class="mt-6 px-1">
-            <app-common-input placeholder="Search through visitor logs..." iconName="search"></app-common-input>
-        </div>
-    </div>
+<ion-content [style.--background]="'var(--ion-color-primary-light)'">
+    <!-- Common Dashboard Header -->
+    <app-dashboard-header [user]="(currentUser$ | async) ?? null" role="resident" actionIcon="add" label=""
+        welcomeSubtitle="Manage your home access and visitors" searchPlaceholder="Search through visitor logs..."
+        (action)="onPreApprove()"></app-dashboard-header>
 
     <!-- Main List/Calendar area -->
-    <div class="px-3 pt-3">
-        <div class="flex items-center justify-between mb-2">
-            <h2 class="text-[18px] font-black text-slate-900 m-0 tracking-tight">Recent Visitors</h2>
-            <div class="bg-slate-50 rounded-full px-3 py-1 flex items-center gap-2">
-                <div class="h-2 w-2 rounded-full bg-emerald-500"></div>
-                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Logs</span>
-            </div>
-        </div>
+    <h2 class="px-5 mt-6 mb-2 text-[18px] font-black text-slate-900 tracking-tight">Recent Visitors</h2>
 
-        <visit-calendar [visitors]="(visitors$ | async) ?? []" emptyText="No visitors found for your flat yet."
-            [showList]="true" class="block"></visit-calendar>
-    </div>
+    <visit-calendar [visitors]="(visitors$ | async) ?? []" emptyText="No visitors found for your flat yet."
+        [showList]="true" class="block pb-32"></visit-calendar>
 </ion-content>

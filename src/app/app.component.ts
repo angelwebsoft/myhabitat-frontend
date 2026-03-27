@@ -47,9 +47,11 @@ export class AppComponent {
 
 
   setTheme(role: string) {
-    const themes = ['admin-theme', 'gatekeeper-theme', 'resident-theme'];
-    document.body.classList.remove(...themes);
-    document.documentElement.classList.remove(...themes);
+    const themes = ['admin-theme', 'gatekeeper-theme', 'resident-theme', 'login-theme'];
+    themes.forEach(thm => {
+      document.body.classList.remove(thm);
+      document.documentElement.classList.remove(thm);
+    });
 
     if (role === 'admin') {
       document.body.classList.add('admin-theme');

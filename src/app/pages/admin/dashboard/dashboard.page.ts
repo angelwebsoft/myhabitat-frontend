@@ -4,6 +4,7 @@ import { IonicModule } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { AppHeaderComponent } from '../../../components/app-header/app-header.component';
 import { CommonCardComponent } from '../../../components/common-card/common-card.component';
+import { DashboardHeaderComponent } from '../../../components/dashboard-header/dashboard-header.component';
 import { DataService } from '../../../services/data.service';
 import { AuthService } from '../../../services/auth.service';
 import { map, switchMap, from } from 'rxjs';
@@ -12,7 +13,8 @@ import { map, switchMap, from } from 'rxjs';
    selector: 'app-admin-dashboard',
    templateUrl: './dashboard.page.html',
    standalone: true,
-   imports: [CommonModule, IonicModule, AppHeaderComponent, CommonCardComponent]
+   imports: [CommonModule, IonicModule, AppHeaderComponent, CommonCardComponent, DashboardHeaderComponent],
+   host: { 'class': 'admin-theme flex flex-col min-h-full' }
 })
 export class AdminDashboardPage implements OnInit {
    private router = inject(Router);

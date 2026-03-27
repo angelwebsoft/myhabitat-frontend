@@ -1,11 +1,27 @@
-<ion-item [lines]="lines" class="flex mb-1 min-h-[40px] items-center rounded-[18px] bg-[#f1f5f9] pl-4 pr-3">
-    <ion-icon *ngIf="iconName" [name]="iconName" class="mr-4 text-slate-400"></ion-icon>
-    <ion-label *ngIf="label" [position]="position">{{ label }}</ion-label>
-    <ion-input #ionInput class="flex-1" [type]="type" [inputmode]="inputmode" [placeholder]="placeholder"
-        [clearInput]="clearInput" [maxlength]="maxlength!" [disabled]="disabled" [(ngModel)]="value"
-        (ngModelChange)="onModelChange($event)" (ionBlur)="onBlur()">
-    </ion-input>
-</ion-item>
-<div class="px-4 py-1 text-sm text-red-500" *ngIf="errorText">
-    {{ errorText }}
+<div class="mb-3">
+    <!-- Compact Wrapper Box (40px) -->
+    <div class="flex items-center h-[40px] rounded-[18px] border-2 border-transparent focus-within:border-primary transition-all pl-4 pr-3 shadow-sm"
+        [ngClass]="customClass ? customClass : (errorText ? 'border-red-100 bg-red-50/20' : 'bg-slate-50')">
+
+        <!-- Left Icon -->
+        <ion-icon *ngIf="iconName" [name]="iconName" [ngClass]="iconClass ? iconClass : 'text-[18px] text-primary mr-3'"
+            class="shrink-0"></ion-icon>
+
+        <!-- Right Content (Label + Input in 40px needs to be carefully handled) -->
+        <!-- We use a flex row for label and input if compact, or just input if label is too long -->
+        <div class="flex-1 flex items-center min-w-0">
+            <label *ngIf="label"
+                class="text-[10px] font-black text-slate-400 uppercase tracking-widest mr-2 shrink-0">{{ label
+                }}:</label>
+            <ion-input #ionInput class="m-0 p-0 text-[14px] font-bold text-slate-800 h-full flex-1" [type]="type"
+                [inputmode]="inputmode" [placeholder]="placeholder" [clearInput]="clearInput" [maxlength]="maxlength!"
+                [disabled]="disabled" [(ngModel)]="value" (ngModelChange)="onModelChange($event)" (ionBlur)="onBlur()"
+                style="--padding-start: 0; --padding-top: 0; --padding-bottom: 0; --padding-end: 0; --highlight-height: 0;"></ion-input>
+        </div>
+    </div>
+
+    <!-- Error Message -->
+    <div class="px-4 mt-1 text-[10px] font-black text-rose-500 uppercase tracking-wider" *ngIf="errorText">
+        {{ errorText }}
+    </div>
 </div>

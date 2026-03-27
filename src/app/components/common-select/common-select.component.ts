@@ -1,7 +1,7 @@
 import { Component, forwardRef, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { IonItem, IonLabel, IonIcon } from '@ionic/angular/standalone';
+import { IonIcon } from '@ionic/angular/standalone';
 
 @Component({
     selector: 'app-common-select',
@@ -9,8 +9,6 @@ import { IonItem, IonLabel, IonIcon } from '@ionic/angular/standalone';
     imports: [
         CommonModule,
         FormsModule,
-        IonItem,
-        IonLabel,
         IonIcon
     ],
     templateUrl: './common-select.component.html',
@@ -29,6 +27,8 @@ export class CommonSelectComponent implements ControlValueAccessor {
     @Input() disabled: boolean = false;
     @Input() errorText?: string;
     @Input() iconName?: string;
+    @Input() customClass: string = '';
+    @Input() iconClass: string = '';
     @Input() lines: 'none' | 'inset' | 'full' = 'none';
     @Input() position: 'stacked' | 'floating' | 'fixed' = 'stacked';
 

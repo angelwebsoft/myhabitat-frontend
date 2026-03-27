@@ -1,7 +1,7 @@
 import { Component, forwardRef, Input, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { IonItem, IonLabel, IonInput, IonIcon } from '@ionic/angular/standalone';
+import { IonInput, IonIcon } from '@ionic/angular/standalone';
 
 @Component({
     selector: 'app-common-input',
@@ -9,8 +9,6 @@ import { IonItem, IonLabel, IonInput, IonIcon } from '@ionic/angular/standalone'
     imports: [
         CommonModule,
         FormsModule,
-        IonItem,
-        IonLabel,
         IonInput,
         IonIcon
     ],
@@ -35,6 +33,8 @@ export class CommonInputComponent implements ControlValueAccessor {
     @Input() disabled: boolean = false;
     @Input() errorText?: string;
     @Input() iconName?: string;
+    @Input() customClass: string = '';
+    @Input() iconClass: string = '';
 
     @ViewChild('ionInput', { static: false }) ionInput: any;
 

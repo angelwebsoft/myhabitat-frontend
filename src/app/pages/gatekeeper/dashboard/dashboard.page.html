@@ -1,0 +1,89 @@
+<ion-header class="ion-no-border">
+  <app-header title="Gatekeeper Home" color="primary"></app-header>
+</ion-header>
+
+<ion-content [style.--background]="'var(--ion-color-primary-light)'">
+  <!-- Common Dashboard Header -->
+  <app-dashboard-header [user]="(currentUser$ | async) ?? null" role="gatekeeper" actionIcon="qr-code" label=""
+    welcomeSubtitle="Monitor society entry and exit points" searchPlaceholder="Search visitor entry requests..."
+    (action)="onScanQr()" (search)="onSearchInternal($event)"></app-dashboard-header>
+
+  <visit-calendar [visitors]="(visitors$ | async) ?? []" title="Visits Calendar"
+    subtitle="Your created requests (date-wise)" [showList]="false" [selectedDate]="selectedDate"
+    (selectedDateChange)="onSelectedDateChange($event)" (tabChange)="onTabChange($event)"
+    class="block sticky top-0 bg-white shadow-sm z-20 mb-4"></visit-calendar>
+
+  <div class="px-3 space-y-4 pb-32">
+    <div *ngFor="let visitor of visitorsForSelectedDate$ | async" class="animate__animated animate__fadeInUp">
+      <app-common-card customClass="m-0" [color]="getStatusColor(visitor.status)">
+        <div slot="header-end" class="rounded-full px-3 py-1 text-[11px] font-bold flex items-center gap-1.5" [ngClass]="{
+                'bg-yellow-100 text-yellow-600': visitor.status === 'pending',
+                'bg-green-100 text-green-600': visitor.status === 'approved',
+                'bg-blue-100 text-blue-600': visitor.status === 'checked-in',
+                'bg-red-100 text-red-600': visitor.status === 'rejected',
+                'bg-gray-100 text-gray-600': visitor.status === 'checked-out'
+              }">
+          <div class="h-1.5 w-1.5 rounded-full" [ngClass]="{
+                  'bg-yellow-500': visitor.status === 'pending',
+                  'bg-green-500': visitor.status === 'approved',
+                  'bg-blue-500': visitor.status === 'checked-in',
+                  'bg-red-500': visitor.status === 'rejected',
+                  'bg-gray-500': visitor.status === 'checked-out'
+                }"></div>
+          {{ getStatusLabel(visitor.status) }}
+        </div>
+
+        <div class="flex items-center gap-4 mb-4">
+          <ion-avatar class="h-[52px] w-[52px] shrink-0 bg-slate-100 rounded-[16px]">
+            <img class="h-full rounded-[16px]"
+              [src]="visitor.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg'" />
+          </ion-avatar>
+          <div class="min-w-0">
+            <h2 class="m-0 truncate text-[17px] font-bold text-slate-800">{{ visitor.visitorName }}</h2>
+            <p class="mt-0.5 text-[13px] font-medium text-slate-400">Flat {{ visitor.flatNumber }}<span
+                *ngIf="visitor.purpose"> • {{ visitor.purpose }}</span></p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-6 text-[13px] text-slate-500 font-medium">
+          <div class="flex items-center gap-2">
+            <ion-icon name="time-outline" class="text-slate-400 text-lg"></ion-icon>
+            {{ visitor.createdAt | date:'shortTime' }}
+          </div>
+          <div class="flex items-center gap-2" *ngIf="visitor.mobile">
+            <ion-icon name="call-outline" class="text-slate-400 text-lg"></ion-icon>
+            {{ visitor.mobile }}
+          </div>
+        </div>
+
+        <div slot="footer" class="w-full mt-4" *ngIf="visitor.status === 'approved' || visitor.status === 'checked-in'">
+          <button *ngIf="visitor.status === 'approved'"
+            class="w-full flex items-center justify-center gap-2 px-6 py-3 text-[14px] font-bold text-white bg-green-500 rounded-2xl shadow-lg shadow-green-500/20 active:scale-[0.98] transition-all"
+            (click)="onCheckIn(visitor.id)">
+            <ion-icon name="checkmark-circle-outline" class="text-xl"></ion-icon>
+            CHECK IN VISITOR
+          </button>
+
+          <button *ngIf="visitor.status === 'checked-in'"
+            class="w-full flex items-center justify-center gap-2 px-6 py-3 text-[14px] font-bold text-white bg-red-500 rounded-2xl shadow-lg shadow-red-500/20 active:scale-[0.98] transition-all"
+            (click)="onCheckOut(visitor.id)">
+            <ion-icon name="log-out-outline" class="text-xl"></ion-icon>
+            CHECK OUT VISITOR
+          </button>
+        </div>
+      </app-common-card>
+    </div>
+  </div>
+
+  <div *ngIf="(visitorsForSelectedDate$ | async)?.length === 0" class="px-5 py-10 text-center text-slate-400">
+    <ion-icon name="document-text-outline" class="mb-2 text-5xl opacity-30"></ion-icon>
+    <p>No visitor requests yet</p>
+  </div>
+</ion-content>
+
+<!-- Native Fixed Floating Action Button (Replaces ion-fab) -->
+<ion-button (click)="onNewEntry()" [style.bottom]="'calc(env(safe-area-inset-bottom, 0px) + 24px)'"
+  class="fixed right-5 z-[99] flex h-[56px] w-[56px] items-center justify-center rounded-full bg-[var(--ion-color-warning)] shadow-[0_6px_16px_rgba(var(--ion-color-warning-rgb),0.4)] transition-transform active:scale-95 sm:bottom-8 sm:right-8"
+  style="--border-radius: 50%;">
+  <ion-icon name="add" class="text-[32px] text-white"></ion-icon>
+</ion-button>

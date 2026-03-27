@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { AppHeaderComponent } from '../../../components/app-header/app-header.component';
 import { CommonCardComponent } from '../../../components/common-card/common-card.component';
 import { CommonInputComponent } from '../../../components/common-input/common-input.component';
+import { DashboardHeaderComponent } from '../../../components/dashboard-header/dashboard-header.component';
 import { VisitCalendarComponent } from '../../../components/visit-calendar/visit-calendar.component';
 import { DataService } from '../../../services/data.service';
 import { AuthService } from '../../../services/auth.service';
@@ -15,7 +16,8 @@ import { Visitor } from '../../../models/visitor.model';
   selector: 'app-resident-dashboard',
   templateUrl: './dashboard.page.html',
   standalone: true,
-  imports: [CommonModule, IonicModule, AppHeaderComponent, CommonCardComponent, CommonInputComponent, VisitCalendarComponent]
+  imports: [CommonModule, IonicModule, AppHeaderComponent, CommonCardComponent, CommonInputComponent, DashboardHeaderComponent, VisitCalendarComponent],
+  host: { 'class': 'resident-theme flex flex-col min-h-full' }
 })
 export class ResidentDashboardPage implements OnInit {
   private dataService = inject(DataService);

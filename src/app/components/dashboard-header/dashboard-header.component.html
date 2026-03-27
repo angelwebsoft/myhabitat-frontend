@@ -1,0 +1,36 @@
+<div
+    class="rounded-b-[40px] bg-white px-4 pb-10 pt-6 shadow-[0_12px_40px_rgba(15,23,42,0.08)] border-b border-slate-50 relative z-20">
+    <!-- Top Profile Row -->
+    <div class="flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3 min-w-0">
+            <div class="h-14 w-14 rounded-[20px] p-0.5 border-2 shadow-sm overflow-hidden shrink-0 bg-slate-50"
+                [ngClass]="themeBorder">
+                <img class="h-full w-full rounded-[18px] object-cover"
+                    [src]="user?.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg'" />
+            </div>
+            <div class="min-w-0">
+                <h2 class="truncate text-[16px] font-black text-slate-900 leading-tight m-0 uppercase tracking-tight">{{
+                    user?.userName }}</h2>
+                <p class="text-[12px] font-bold text-slate-400 m-0 uppercase tracking-widest mt-1">{{ subtitle }}</p>
+            </div>
+        </div>
+
+        <!-- Action Button -->
+        <button (click)="onActionClick()" [ngClass]="[actionButtonClass, themeShadow]">
+            <ion-icon [name]="actionIcon" class="text-[20px]"></ion-icon>
+            <span *ngIf="label" class="ml-2 text-[13px] font-black uppercase tracking-wider">{{ label }}</span>
+        </button>
+    </div>
+
+    <!-- Greeting Section -->
+    <div class="mt-10 animate__animated animate__fadeIn">
+        <h1 class="text-[28px] font-black text-slate-900 leading-none m-0">Welcome, {{ firstName }}</h1>
+        <p class="text-[14px] font-bold text-slate-400 m-0 mt-3">{{ welcomeSubtitle }}</p>
+    </div>
+
+    <!-- Search Input -->
+    <div class="mt-8">
+        <app-common-input [placeholder]="searchPlaceholder" iconName="search" [ngModel]="searchTerm"
+            (ngModelChange)="onSearchInternal($event)" customClass="bg-primary-20"></app-common-input>
+    </div>
+</div>

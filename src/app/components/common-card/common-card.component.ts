@@ -9,9 +9,9 @@ import { IonicModule } from '@ionic/angular';
     imports: [CommonModule, IonicModule],
     styles: [`
     .modern-card {
-      margin: 16px;
-      border-radius: 32px;
-      padding: 24px;
+      
+      border-radius: 10px;
+      padding: 6px 14px;
       background: #ffffff;
       box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.03), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
       border: 1px solid rgba(226, 232, 240, 0.5); /* Very light slate-200 */

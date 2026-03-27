@@ -13,73 +13,7 @@ import { CommonDateComponent } from '../../../components/common-date/common-date
 
 @Component({
   selector: 'app-pre-approve',
-  template: `
-    <app-header title="Pre-Approve Guest" color="tertiary" [showBack]="true" defaultHref="/resident"></app-header>
-
-    <ion-content class="ion-padding bg-slate-50">
-      <div *ngIf="qrDataUrl" class="mb-5 rounded-[24px] bg-white p-4 shadow-[0_8px_24px_rgba(15,23,42,0.06)] border border-slate-100/80">
-        <h2 class="m-0 text-[16px] font-bold text-slate-800">Guest Pass</h2>
-        <p class="mt-1 text-[13px] text-slate-500">Ask the guest to show this QR to the gatekeeper.</p>
-
-        <div class="mt-4 flex items-center gap-4">
-          <button type="button" class="shrink-0 rounded-2xl border border-slate-200 bg-white p-2" (click)="openQr()">
-            <img [src]="qrDataUrl" alt="Guest QR" class="h-[110px] w-[110px]" />
-          </button>
-          <div class="min-w-0">
-            <p class="m-0 truncate text-[15px] font-bold text-slate-800">{{ guest.visitorName }}</p>
-            <p class="mt-1 truncate text-[13px] text-slate-500">{{ guest.mobile }}</p>
-            <p class="mt-1 truncate text-[13px] text-slate-500">{{ guest.validDate | date:'mediumDate' }}</p>
-            <p class="mt-1 truncate text-[11px] text-slate-400">Token: {{ qrToken }}</p>
-            <ion-button size="small" class="mt-2 font-bold" color="tertiary" fill="clear" (click)="openQr()">
-              Enlarge QR
-            </ion-button>
-          </div>
-        </div>
-
-        <ion-button expand="block" shape="round" class="mt-4 font-bold h-11" color="tertiary" (click)="onDone()">
-          Done
-        </ion-button>
-      </div>
-
-      <div class="space-y-4 pt-2">
-        <app-common-input label="Guest Name" iconName="person-outline" placeholder="Enter guest name" [(ngModel)]="guest.visitorName"></app-common-input>
-        <app-common-input label="Mobile Number" type="tel" iconName="call-outline" placeholder="Enter mobile number" [(ngModel)]="guest.mobile"></app-common-input>
-        <app-common-date label="Visit Date" iconName="calendar-outline" [(ngModel)]="guest.validDate"></app-common-date>
-      </div>
-
-      <ion-button expand="block" shape="round" color="tertiary" (click)="onSubmit()" [disabled]="!isValid()" class="mt-6 font-bold h-12 [--box-shadow:none]">
-        Generate Pre-Approval
-      </ion-button>
-
-      <ion-modal [isOpen]="isQrModalOpen" (didDismiss)="closeQr()">
-        <ng-template>
-          <ion-header class="ion-no-border">
-            <ion-toolbar color="tertiary">
-              <ion-title>Guest QR</ion-title>
-              <ion-buttons slot="end">
-                <ion-button fill="clear" size="small" aria-label="Close" (click)="closeQr()">
-                  <ion-icon name="close" slot="icon-only"></ion-icon>
-                </ion-button>
-              </ion-buttons>
-            </ion-toolbar>
-          </ion-header>
-          <ion-content class="ion-padding" color="light">
-            <div class="rounded-2xl bg-white p-4 shadow-[0_6px_18px_rgba(15,23,42,0.06)]">
-              <p class="m-0 text-[14px] font-bold text-slate-800">{{ guest.visitorName }}</p>
-              <p class="mt-1 text-[13px] text-slate-500">{{ guest.mobile }} • {{ guest.validDate | date:'mediumDate' }}</p>
-              <div class="mt-4 flex items-center justify-center">
-                <img [src]="qrDataUrl" alt="Guest QR Large" class="h-[320px] w-[320px] rounded-2xl border border-slate-200 bg-white p-3" />
-              </div>
-              <ion-item lines="none" class="mt-4 [--background:#f4f5f8] [--border-radius:12px]">
-                <ion-label class="text-[12px] text-slate-500">Token</ion-label>
-                <ion-note slot="end" class="select-all text-[12px]">{{ qrToken }}</ion-note>
-              </ion-item>
-            </div>
-          </ion-content>
-        </ng-template>
-      </ion-modal>
-    </ion-content>
-  `,
+  templateUrl: './pre-approve.page.html',
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule, AppHeaderComponent, CommonInputComponent, CommonDateComponent]
 })
@@ -106,12 +40,18 @@ export class PreApprovePage {
   }
 
   async onSubmit() {
-    const loading = await this.loadingCtrl.create({ message: 'Creating...' });
+    if (!this.isValid()) return;
+
+    const loading = await this.loadingCtrl.create({
+      message: 'Generating Pass...',
+      spinner: 'crescent',
+      cssClass: 'custom-loading'
+    });
     await loading.present();
 
     try {
       const user = this.authService.currentUser$.value;
-      if (!user) throw new Error('User not found');
+      if (!user) throw new Error('User context not found. Please log in again.');
 
       const created = await this.dataService.addPreApprovedGuest({
         visitorName: this.guest.visitorName,
@@ -121,24 +61,29 @@ export class PreApprovePage {
         societyId: user.societyId
       });
 
-      await loading.dismiss();
       this.qrToken = created.qrToken || '';
-      if (!this.qrToken) {
-        throw new Error('QR token was not generated');
-      }
+      if (!this.qrToken) throw new Error('Security token generation failed.');
 
       const qrUrl = await this.generateQrDataUrl(this.qrToken);
       this.qrDataUrl = this.sanitizer.bypassSecurityTrustUrl(qrUrl);
 
+      await loading.dismiss();
       const toast = await this.toastCtrl.create({
-        message: 'Pre-approval created. Share the QR with the guest.',
-        duration: 3000,
-        color: 'success'
+        message: 'Pass Created Successfully',
+        duration: 2000,
+        position: 'top',
+        color: 'success',
+        cssClass: 'custom-toast'
       });
       toast.present();
     } catch (error: any) {
       await loading.dismiss();
-      const toast = await this.toastCtrl.create({ message: error.message, duration: 3000, color: 'danger' });
+      const toast = await this.toastCtrl.create({
+        message: error.message,
+        duration: 3000,
+        color: 'danger',
+        position: 'top'
+      });
       toast.present();
     }
   }
@@ -158,10 +103,16 @@ export class PreApprovePage {
 
   private async generateQrDataUrl(text: string): Promise<string> {
     try {
-      return await QRCode.toDataURL(text, { width: 260, margin: 1 });
+      return await QRCode.toDataURL(text, {
+        width: 400,
+        margin: 2,
+        color: {
+          dark: '#0f172a',
+          light: '#ffffff'
+        }
+      });
     } catch {
-      // Simple fallback so the flow still works even if QR lib isn't installed yet.
-      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="260" height="260"><rect width="100%" height="100%" fill="white"/><text x="12" y="36" font-size="14" fill="black">QR Token:</text><text x="12" y="60" font-size="12" fill="black">${text}</text></svg>`;
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="100%" height="100%" fill="white"/><text x="20" y="50" font-size="20" font-weight="bold" fill="#0f172a">Token: ${text}</text></svg>`;
       return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
     }
   }

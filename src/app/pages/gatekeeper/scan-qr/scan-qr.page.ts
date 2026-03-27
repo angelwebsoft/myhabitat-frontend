@@ -11,46 +11,7 @@ import { AppHeaderComponent } from '../../../components/app-header/app-header.co
 
 @Component({
   selector: 'app-scan-qr',
-  template: `
-    <app-header
-      title="Scan Guest QR"
-      color="warning"
-      titleColor="dark"
-      [showBack]="true"
-      defaultHref="/gatekeeper"
-      backButtonColor="dark"
-    ></app-header>
-
-    <ion-content class="ion-padding" color="light">
-      <ion-card class="m-0 rounded-[18px] shadow-[0_6px_18px_rgba(15,23,42,0.06)]">
-        <ion-card-content>
-          <p class="m-0 text-[14px] text-slate-600">
-            Scan the resident-generated QR to auto check-in the pre-approved guest.
-          </p>
-
-          <div class="mt-4 overflow-hidden rounded-[14px] bg-black">
-            <video #video autoplay playsinline class="block h-[240px] w-full object-cover"></video>
-          </div>
-
-	          <div *ngIf="!isSecureContext" class="mt-4 rounded-[14px] bg-amber-50 p-3 text-[13px] text-amber-900">
-	            Live scan is blocked because this page is not running in a secure context (HTTPS).
-	            Use <span class="font-mono">npm run start:https</span> and open the app using HTTPS (accept the certificate warning), or install the app.
-	          </div>
-
-          <ion-button expand="block" class="mt-4" color="warning" (click)="startLiveScan()" [disabled]="isScanning || !canLiveScan || !isSecureContext">
-            Start Scan
-          </ion-button>
-          <ion-button expand="block" class="mt-3" color="medium" (click)="stopScan()" [disabled]="!isScanning">
-            Stop Scan
-          </ion-button>
-
-          <ion-button expand="block" class="mt-5" color="success" (click)="scanWithNativeCamera()">
-            If Scan Fails: Use Camera Capture
-          </ion-button>
-        </ion-card-content>
-      </ion-card>
-    </ion-content>
-  `,
+  templateUrl: './scan-qr.page.html',
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule, AppHeaderComponent]
 })
