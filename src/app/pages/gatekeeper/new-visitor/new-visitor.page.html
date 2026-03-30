@@ -1,54 +1,86 @@
-<ion-header class="ion-no-border">
-    <app-header title="New Visitor Entry" color="primary" [showBack]="true" defaultHref="/gatekeeper"></app-header>
-</ion-header>
+<app-header title="New Visitor Entry" color="primary" [showBack]="true" defaultHref="/gatekeeper"></app-header>
 
-<ion-content class="bg-[#f8fafc]">
-    <div class="px-5 pt-6 pb-20 animate__animated animate__fadeIn">
-        <div class="mb-8">
-            <h1 class="text-[24px] font-black text-slate-900 m-0">Visitor Registration</h1>
-            <p class="text-[14px] font-medium text-slate-400 m-0 mt-1">Collect visitor details for entry authorization
-            </p>
+<ion-content [style.--background]="'var(--ion-color-primary-light)'">
+    <!-- Top Info Panel -->
+    <div
+        class="bg-white p-5 rounded-b-[40px] shadow-[0_4px_20px_rgba(15,23,42,0.04)] border-b border-slate-50 animate__animated animate__fadeInDown">
+        <div class="flex items-center gap-4 mb-3">
+            <div class="h-14 w-14 bg-primary-20 rounded-[16px] flex items-center justify-center shrink-0">
+                <ion-icon name="person-add" class="text-3xl text-primary"></ion-icon>
+            </div>
+            <h1 class="m-0 text-[26px] font-black text-slate-900 leading-tight">Visitor<br />Registration</h1>
         </div>
+        <p class="ml-1 m-0 text-[14px] font-bold text-slate-400">Collect visitor details for entry authorization.</p>
+    </div>
 
-        <app-common-card customClass="m-0 border-0 shadow-lg shadow-slate-200/50">
-            <!-- Form Header Section -->
-            <div class="flex items-center gap-4 mb-8">
-                <div (click)="fileInput.click()"
-                    class="h-[80px] w-[80px] rounded-[32px] bg-slate-50 border-2 border-dashed border-slate-200 flex flex-col items-center justify-center cursor-pointer relative overflow-hidden group">
-                    <img *ngIf="form.photoURL" [src]="form.photoURL"
-                        class="h-full w-full object-cover rounded-[32px]" />
-                    <ion-icon *ngIf="!form.photoURL" name="camera-outline"
-                        class="text-[28px] text-slate-400 group-active:scale-95 transition-transform"></ion-icon>
-                    <span *ngIf="!form.photoURL" class="text-[10px] font-bold text-slate-400 mt-1">PHOTO</span>
-                    <input #fileInput type="file" (change)="onFileChange($event)" accept="image/*" class="hidden" />
+    <div class="px-4 animate__animated animate__fadeInUp">
+        <div class="p-6 space-y-6 bg-white mt-4 rounded-[28px] shadow-sm border border-slate-50 overflow-hidden">
+
+            <!-- Photo Capture Section -->
+            <div class="flex items-center gap-5 p-4 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 active:bg-slate-100 transition-colors cursor-pointer relative"
+                (click)="fileInput.click()">
+                <div
+                    class="h-20 w-20 rounded-2xl bg-white shadow-sm flex flex-col items-center justify-center overflow-hidden border border-slate-100">
+                    <img *ngIf="form.photoURL" [src]="form.photoURL" class="h-full w-full object-cover" />
+                    <ng-container *ngIf="!form.photoURL">
+                        <ion-icon name="camera" class="text-3xl text-primary"></ion-icon>
+                    </ng-container>
                 </div>
                 <div class="flex-1">
-                    <h2 class="text-[16px] font-extrabold text-slate-800 m-0">Visitor Profile</h2>
-                    <p class="text-[12px] font-semibold text-slate-400 m-0">Please click to capture a photo if required.
-                    </p>
+                    <h3 class="text-[14px] font-black text-slate-800 m-0">Visitor Photo</h3>
+                    <p class="text-[11px] font-bold text-slate-400 m-0 mt-0.5">Capture photo if required</p>
                 </div>
+                <input #fileInput type="file" (change)="onFileChange($event)" accept="image/*" class="hidden" />
             </div>
 
             <!-- Form Inputs -->
-            <div class="space-y-6">
-                <app-common-input label="Visitor Full Name" placeholder="e.g. Rahul Sharma" iconName="person-outline"
-                    [(ngModel)]="form.visitorName"></app-common-input>
-                <app-common-input label="Mobile Number" placeholder="e.g. 9876543210" iconName="call-outline" type="tel"
-                    [(ngModel)]="form.mobile"></app-common-input>
-                <app-common-select label="Select Flat Number" iconName="home-outline" placeholder="Pick destination"
-                    [options]="flatOptions" [(ngModel)]="form.flatNumber"></app-common-select>
-                <app-common-input label="Purpose of Visit" placeholder="e.g. Delivery, Guest, Service"
-                    iconName="document-text-outline" [(ngModel)]="form.purpose"></app-common-input>
+            <div class="space-y-5">
+                <div>
+                    <ion-label
+                        class="mb-2 ml-1 block text-[13px] font-black text-slate-500 uppercase tracking-wider">Visitor
+                        Name</ion-label>
+                    <app-common-input customClass="bg-primary-10" iconName="person" placeholder="e.g. Rahul Sharma"
+                        [(ngModel)]="form.visitorName"></app-common-input>
+                </div>
+
+                <div>
+                    <ion-label
+                        class="mb-2 ml-1 block text-[13px] font-black text-slate-500 uppercase tracking-wider">Mobile
+                        Number</ion-label>
+                    <app-common-input customClass="bg-primary-10" type="tel" iconName="call"
+                        placeholder="e.g. 9876543210" [(ngModel)]="form.mobile"></app-common-input>
+                </div>
+
+                <div>
+                    <ion-label
+                        class="mb-2 ml-1 block text-[13px] font-black text-slate-500 uppercase tracking-wider">Select
+                        Flat</ion-label>
+                    <app-common-select customClass="bg-primary-10" iconName="home" placeholder="Pick destination"
+                        [options]="flatOptions" [(ngModel)]="form.flatNumber"></app-common-select>
+                </div>
+
+                <div>
+                    <ion-label
+                        class="mb-2 ml-1 block text-[13px] font-black text-slate-500 uppercase tracking-wider">Vehicle
+                        Number</ion-label>
+                    <app-common-input customClass="bg-primary-10" iconName="car-sport-outline"
+                        placeholder="e.g. GJ01 AA 0000" [(ngModel)]="form.vehicleNumber"></app-common-input>
+                </div>
+
+                <div>
+                    <ion-label
+                        class="mb-2 ml-1 block text-[13px] font-black text-slate-500 uppercase tracking-wider">Purpose</ion-label>
+                    <app-common-input customClass="bg-primary-10" iconName="document-text"
+                        placeholder="e.g. Delivery, Guest, Service" [(ngModel)]="form.purpose"></app-common-input>
+                </div>
             </div>
 
-            <!-- Submit Button matching the theme -->
-            <div slot="footer" class="w-full pt-10">
-                <button (click)="onSubmit()" [disabled]="!isValid" [class.opacity-50]="!isValid"
-                    class="w-full flex items-center justify-center gap-3 py-4 text-[16px] font-black text-black bg-[#22c55e] rounded-[24px] shadow-[0_12px_24px_-8px_rgba(34,197,94,0.5)] active:scale-[0.98] transition-all">
-                    <ion-icon name="checkmark-circle" class="text-2xl"></ion-icon>
-                    AUTHORIZE ENTRY
-                </button>
-            </div>
-        </app-common-card>
+            <!-- Submit Button -->
+            <button [disabled]="!isValid" (click)="onSubmit()"
+                class="w-full h-15 flex items-center justify-center gap-3 bg-indigo-500 text-white rounded-[24px] font-black uppercase tracking-widest shadow-xl shadow-indigo-500/40 active:scale-95 transition-all outline-none border-0 disabled:opacity-50 disabled:grayscale disabled:scale-100 py-4 mt-4">
+                <ion-icon name="flash" class="text-xl"></ion-icon>
+                AUTHORIZE ENTRY
+            </button>
+        </div>
     </div>
 </ion-content>

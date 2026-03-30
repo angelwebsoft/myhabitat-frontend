@@ -4,42 +4,72 @@
 
 <ion-content [style.--background]="'var(--ion-color-primary-light)'">
   <!-- Common Dashboard Header -->
-  <app-dashboard-header [user]="(currentUser$ | async) ?? null" role="admin" actionIcon="log-out" label="EXIT"
+  <app-dashboard-header [user]="(currentUser$ | async) ?? null" role="admin" actionIcon="" label="" [showSearch]="false"
     welcomeSubtitle="Society metrics and administrator tools" searchPlaceholder="Search residents or staff..."
     (action)="onLogout()"></app-dashboard-header>
 
   <!-- Stats & Management -->
-  <div class="px-6 pt-8 pb-32 animate__animated animate__fadeIn">
+  <div class="px-4 pt-8 pb-2 animate__animated animate__fadeIn">
     <!-- Stats Row -->
     <div class="grid grid-cols-2 gap-4 mb-8">
-      <div class="bg-slate-50 rounded-[28px] p-5 shadow-sm border border-slate-100/60">
-        <div class="flex flex-col gap-1">
-          <div class="h-10 w-10 rounded-2xl bg-emerald-50 flex items-center justify-center mb-1">
+      <!-- Residents Stat -->
+      <div (click)="goTo('admin/users/residents')"
+        class="bg-white rounded-[10px] p-4 shadow-sm border border-slate-100/60 active:scale-98 cursor-pointer transition-all">
+        <div class="flex items-center justify-between mb-2">
+          <div class="h-10 w-10 rounded-xl bg-emerald-50 flex items-center justify-center">
             <ion-icon name="people" class="text-xl text-emerald-500"></ion-icon>
           </div>
-          <span class="text-[11px] font-black text-slate-400 uppercase tracking-widest">RESIDENTS</span>
-          <span class="text-[28px] font-black text-slate-900 leading-none mt-1">{{ (stats$ | async)?.residents || 0
-            }}</span>
+          <span class="text-[24px] font-black text-slate-900 leading-none">{{ (stats$ | async)?.residents || 0 }}</span>
         </div>
+        <p class="m-0 text-[10px] font-black text-slate-400 uppercase tracking-widest">RESIDENTS</p>
       </div>
-      <div class="bg-slate-50 rounded-[28px] p-5 shadow-sm border border-slate-100/60">
-        <div class="flex flex-col gap-1">
-          <div class="h-10 w-10 rounded-2xl bg-amber-50 flex items-center justify-center mb-1">
+
+      <!-- Staff Stat -->
+      <div (click)="goTo('admin/users/gatekeepers')"
+        class="bg-white rounded-[10px] p-4 shadow-sm border border-slate-100/60 active:scale-98 cursor-pointer transition-all">
+        <div class="flex items-center justify-between mb-2">
+          <div class="h-10 w-10 rounded-xl bg-amber-50 flex items-center justify-center">
             <ion-icon name="shield-checkmark" class="text-xl text-amber-500"></ion-icon>
           </div>
-          <span class="text-[11px] font-black text-slate-400 uppercase tracking-widest">STAFF</span>
-          <span class="text-[28px] font-black text-slate-900 leading-none mt-1">{{ (stats$ | async)?.gatekeepers || 0
+          <span class="text-[24px] font-black text-slate-900 leading-none">{{ (stats$ | async)?.gatekeepers || 0
             }}</span>
         </div>
+        <p class="m-0 text-[10px] font-black text-slate-400 uppercase tracking-widest">STAFF</p>
+      </div>
+
+      <!-- Inside Stat -->
+      <div (click)="goTo('admin/visitors', { status: 'checked-in' })"
+        class="bg-white rounded-[10px] p-4 shadow-sm border border-slate-100/60 active:scale-98 cursor-pointer transition-all">
+        <div class="flex items-center justify-between mb-2">
+          <div class="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center">
+            <ion-icon name="enter" class="text-xl text-blue-500"></ion-icon>
+          </div>
+          <span class="text-[24px] font-black text-slate-900 leading-none">{{ (stats$ | async)?.activeVisitors || 0
+            }}</span>
+        </div>
+        <p class="m-0 text-[10px] font-black text-slate-400 uppercase tracking-widest">INSIDE</p>
+      </div>
+
+      <!-- Today Stat -->
+      <div (click)="goTo('admin/visitors', { date: 'today' })"
+        class="bg-white rounded-[10px] p-4 shadow-sm border border-slate-100/60 active:scale-98 cursor-pointer transition-all">
+        <div class="flex items-center justify-between mb-2">
+          <div class="h-10 w-10 rounded-xl bg-rose-50 flex items-center justify-center">
+            <ion-icon name="calendar-number" class="text-xl text-rose-500"></ion-icon>
+          </div>
+          <span class="text-[24px] font-black text-slate-900 leading-none">{{ (stats$ | async)?.todayTotal || 0
+            }}</span>
+        </div>
+        <p class="m-0 text-[10px] font-black text-slate-400 uppercase tracking-widest">TODAY</p>
       </div>
     </div>
 
     <!-- Management Sections -->
-    <div class="mb-4">
+    <div>
       <h3 class="text-[14px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-4">Management</h3>
       <div class="space-y-4">
         <button (click)="goTo('admin/users/residents')"
-          class="w-full h-20 flex items-center justify-between p-5 bg-white rounded-[24px] border border-slate-100 shadow-sm active:scale-98 transition-all">
+          class="w-full h-20 flex items-center justify-between p-5 bg-white rounded-[10px] border border-slate-100 shadow-sm active:scale-98 transition-all">
           <div class="flex items-center gap-4">
             <div class="h-12 w-12 rounded-[16px] bg-indigo-50 flex items-center justify-center">
               <ion-icon name="people" class="text-[24px] text-indigo-500"></ion-icon>
@@ -53,7 +83,7 @@
         </button>
 
         <button (click)="goTo('admin/users/gatekeepers')"
-          class="w-full h-20 flex items-center justify-between p-5 bg-white rounded-[24px] border border-slate-100 shadow-sm active:scale-98 transition-all">
+          class="w-full h-20 flex items-center justify-between p-5 bg-white rounded-[10px] border border-slate-100 shadow-sm active:scale-98 transition-all">
           <div class="flex items-center gap-4">
             <div class="h-12 w-12 rounded-[16px] bg-orange-50 flex items-center justify-center">
               <ion-icon name="shield-half" class="text-[24px] text-orange-500"></ion-icon>
@@ -61,6 +91,20 @@
             <div class="text-left">
               <h3 class="text-[17px] font-black text-slate-800 m-0">Security</h3>
               <p class="text-[12px] font-bold text-slate-400 m-0">Manage gatekeeper list</p>
+            </div>
+          </div>
+          <ion-icon name="chevron-forward" class="text-slate-300"></ion-icon>
+        </button>
+
+        <button (click)="goTo('admin/users/admins')"
+          class="w-full h-20 flex items-center justify-between p-5 bg-white rounded-[10px] border border-slate-100 shadow-sm active:scale-98 transition-all">
+          <div class="flex items-center gap-4">
+            <div class="h-12 w-12 rounded-[16px] bg-emerald-50 flex items-center justify-center">
+              <ion-icon name="person-circle" class="text-[24px] text-emerald-500"></ion-icon>
+            </div>
+            <div class="text-left">
+              <h3 class="text-[17px] font-black text-slate-800 m-0">Admins</h3>
+              <p class="text-[12px] font-bold text-slate-400 m-0">Manage system administrators</p>
             </div>
           </div>
           <ion-icon name="chevron-forward" class="text-slate-300"></ion-icon>

@@ -1,34 +1,89 @@
-<app-header title="Scan Guest QR" color="warning" titleColor="dark" [showBack]="true" defaultHref="/gatekeeper"
-    backButtonColor="dark"></app-header>
+<ion-content [fullscreen]="false" class="bg-[#0f172a]">
+    <div class="flex flex-col h-full bg-[#0f172a]">
+        <!-- Top Header -->
+        <div class="relative w-full p-6 pt-10 pb-4 flex items-center justify-between z-50">
+            <div class="flex items-center gap-4 w-max p-2 rounded-2xl active:bg-white/10 transition-colors"
+                (click)="goBack()">
+                <div
+                    class="h-10 w-10 bg-white/10 backdrop-blur-xl rounded-xl flex items-center justify-center border border-white/10">
+                    <ion-icon name="chevron-back" class="text-white text-xl"></ion-icon>
+                </div>
+                <h2 class="m-0 text-[18px] font-black uppercase tracking-widest text-white drop-shadow-md">Scanner</h2>
+            </div>
 
-<ion-content class="ion-padding" color="light">
-    <ion-card class="m-0 rounded-[18px] shadow-[0_6px_18px_rgba(15,23,42,0.06)]">
-        <ion-card-content>
-            <p class="m-0 text-[14px] text-slate-600">
-                Scan the resident-generated QR to auto check-in the pre-approved guest.
+            <button (click)="openGallery()"
+                class="h-10 px-4 bg-orange-500/20 text-orange-400 rounded-xl font-bold flex items-center gap-2 active:bg-orange-500/30 transition-colors">
+                <ion-icon name="image"></ion-icon>
+                Gallery
+            </button>
+        </div>
+
+        <!-- Camera Interface Area -->
+        <div class="flex-1 flex flex-col items-center justify-center px-6 pb-20">
+            <!-- Camera Viewfinder Box -->
+            <div
+                class="relative w-full max-w-[320px] aspect-square rounded-[40px] overflow-hidden bg-black/50 border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] flex items-center justify-center">
+                <!-- Video Stream -->
+                <video #video [style.opacity]="isScanning ? 1 : 0" playsinline muted
+                    class="w-full h-full object-cover"></video>
+
+                <!-- Loading State waiting for Camera -->
+                <div *ngIf="!isScanning && !scannedResult"
+                    class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                    <ion-spinner name="crescent" color="warning"></ion-spinner>
+                    <p class="text-white/40 mt-4 text-sm font-bold uppercase tracking-widest">Warming Up Camera</p>
+                </div>
+
+                <!-- Laser Overlay -->
+                <div *ngIf="isScanning" class="absolute inset-0 pointer-events-none">
+                    <div class="scanner-laser border-b-2 border-orange-500 shadow-[0_5px_15px_rgba(245,158,11,0.6)]">
+                    </div>
+                    <div
+                        class="absolute top-0 left-0 w-10 h-10 border-t-4 border-l-4 border-orange-500 rounded-tl-[35px] m-4">
+                    </div>
+                    <div
+                        class="absolute top-0 right-0 w-10 h-10 border-t-4 border-r-4 border-orange-500 rounded-tr-[35px] m-4">
+                    </div>
+                    <div
+                        class="absolute bottom-0 left-0 w-10 h-10 border-b-4 border-l-4 border-orange-500 rounded-bl-[35px] m-4">
+                    </div>
+                    <div
+                        class="absolute bottom-0 right-0 w-10 h-10 border-b-4 border-r-4 border-orange-500 rounded-br-[35px] m-4">
+                    </div>
+                </div>
+
+                <!-- Success State Overlay inside the box -->
+                <div *ngIf="scannedResult && !scanError"
+                    class="absolute inset-0 bg-green-500/95 flex flex-col items-center justify-center backdrop-blur-md z-30 animate__animated animate__fadeIn">
+                    <ion-icon name="checkmark-circle" class="text-white text-6xl drop-shadow-md"></ion-icon>
+                    <p class="text-white font-black mt-3 text-2xl tracking-widest drop-shadow">VERIFIED</p>
+                </div>
+
+                <!-- Error State Overlay -->
+                <div *ngIf="scanError"
+                    class="absolute inset-0 bg-red-600/95 flex flex-col items-center justify-center backdrop-blur-md z-30 animate__animated animate__fadeIn">
+                    <ion-icon name="alert-circle"
+                        class="text-white text-6xl drop-shadow-md animate__animated animate__shakeX"></ion-icon>
+                    <p
+                        class="text-white font-black mt-3 text-xl tracking-widest drop-shadow text-center px-4 uppercase">
+                        {{ scanError }}</p>
+                </div>
+            </div>
+
+            <!-- Context Info -->
+            <div class="mt-12 text-center">
+                <h3 class="text-white text-2xl font-black m-0 uppercase tracking-tight drop-shadow-lg">Scan Guest Pass
+                </h3>
+                <p
+                    class="text-white/60 text-[15px] font-bold m-0 mt-3 drop-shadow-lg leading-relaxed max-w-[280px] mx-auto">
+                    Align the QR code strictly inside the frame to capture and authorize entry.
+                </p>
+            </div>
+
+            <p *ngIf="isScanning"
+                class="text-orange-500/50 text-[10px] font-black uppercase tracking-[0.2em] text-center mt-6 animate__animated animate__flash animate__slow animate__infinite">
+                Hardware Scanner Active
             </p>
-
-            <div class="mt-4 overflow-hidden rounded-[14px] bg-black">
-                <video #video autoplay playsinline class="block h-[240px] w-full object-cover"></video>
-            </div>
-
-            <div *ngIf="!isSecureContext" class="mt-4 rounded-[14px] bg-amber-50 p-3 text-[13px] text-amber-900">
-                Live scan is blocked because this page is not running in a secure context (HTTPS).
-                Use <span class="font-mono">npm run start:https</span> and open the app using HTTPS (accept the
-                certificate warning), or install the app.
-            </div>
-
-            <ion-button expand="block" class="mt-4" color="warning" (click)="startLiveScan()"
-                [disabled]="isScanning || !canLiveScan || !isSecureContext">
-                Start Scan
-            </ion-button>
-            <ion-button expand="block" class="mt-3" color="medium" (click)="stopScan()" [disabled]="!isScanning">
-                Stop Scan
-            </ion-button>
-
-            <ion-button expand="block" class="mt-5" color="success" (click)="scanWithNativeCamera()">
-                If Scan Fails: Use Camera Capture
-            </ion-button>
-        </ion-card-content>
-    </ion-card>
+        </div>
+    </div>
 </ion-content>

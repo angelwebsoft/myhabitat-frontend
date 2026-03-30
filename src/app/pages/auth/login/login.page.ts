@@ -129,7 +129,6 @@ export class LoginPage {
       const response = await this.authService.verifyOtp(this.otp, this.role);
 
       if (response.success) {
-        this.clearThemes();
         localStorage.setItem('userRole', this.role);
 
         this.showToast('Login successful!');

@@ -7,6 +7,8 @@ import { CommonCardComponent } from '../../../components/common-card/common-card
 import { CommonInputComponent } from '../../../components/common-input/common-input.component';
 import { DashboardHeaderComponent } from '../../../components/dashboard-header/dashboard-header.component';
 import { VisitCalendarComponent } from '../../../components/visit-calendar/visit-calendar.component';
+import { CommonQrComponent } from '../../../components/common-qr/common-qr.component';
+import { CommonVisitorDetailsComponent } from '../../../components/common-visitor-details/common-visitor-details.component';
 import { DataService } from '../../../services/data.service';
 import { AuthService } from '../../../services/auth.service';
 import { Observable, Subscription, of } from 'rxjs';
@@ -16,7 +18,7 @@ import { Visitor } from '../../../models/visitor.model';
   selector: 'app-resident-dashboard',
   templateUrl: './dashboard.page.html',
   standalone: true,
-  imports: [CommonModule, IonicModule, AppHeaderComponent, CommonCardComponent, CommonInputComponent, DashboardHeaderComponent, VisitCalendarComponent],
+  imports: [CommonModule, IonicModule, AppHeaderComponent, CommonCardComponent, CommonInputComponent, DashboardHeaderComponent, VisitCalendarComponent, CommonQrComponent, CommonVisitorDetailsComponent],
   host: { 'class': 'resident-theme flex flex-col min-h-full' }
 })
 export class ResidentDashboardPage implements OnInit {
@@ -26,7 +28,25 @@ export class ResidentDashboardPage implements OnInit {
 
   currentUser$ = this.authService.currentUser$;
   visitors$: Observable<Visitor[]> = of([]);
+  selectedVisitor: Visitor | null = null;
+  isDetailsModalOpen = false;
+  isQrModalOpen = false;
+  qrTokenForLargeView = '';
   private sub?: Subscription;
+
+  viewVisitorDetails(visitor: Visitor) {
+    this.selectedVisitor = visitor;
+    this.isDetailsModalOpen = true;
+  }
+
+  showFullQr(token: string) {
+    this.qrTokenForLargeView = token;
+    this.isQrModalOpen = true;
+  }
+
+  closeQrModal() {
+    this.isQrModalOpen = false;
+  }
 
   ngOnInit() {
     this.sub = this.authService.currentUser$.subscribe(async user => {

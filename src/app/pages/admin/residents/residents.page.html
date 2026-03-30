@@ -1,261 +1,148 @@
-<app-header [title]="headerTitle" color="primary" [showBack]="true" defaultHref="/admin"></app-header>
+<ion-header class="ion-no-border">
+  <app-header [title]="viewRole + ' Management'" color="primary" [showBack]="true" defaultHref="/admin"></app-header>
+</ion-header>
 
-<ion-content class="ion-padding-bottom residents-content">
-  <!-- <div class="px-4 pt-4">
-    <h2 class="m-0 text-[1.2rem] font-extrabold text-slate-900">{{ sectionTitle }}</h2>
-    <p class="mt-1 text-[13px] text-slate-500" *ngIf="sectionTitle === 'List'">Browse, search and edit users</p>
-    <p class="mt-1 text-[13px] text-slate-500" *ngIf="sectionTitle === 'Add'">Create a new user</p>
-  </div> -->
+<ion-content [style.--background]="'var(--ion-color-primary-light)'">
+  <div class="sticky top-0 z-20 bg-white shadow-sm mb-4">
+    <div class="px-5 py-4 flex items-center justify-between">
+      <div>
+        <h1 class="m-0 text-[18px] font-black text-slate-900 leading-tight uppercase tracking-tight">{{ viewRole }}
+          Directory</h1>
+        <p class="m-0 text-[12px] font-bold text-slate-400 uppercase tracking-widest mt-1">Manage society {{ viewRole
+          }}s
+        </p>
+      </div>
+    </div>
 
-  <div slot="fixed" class="py-2.5 px-3 flex items-center gap-2 residents-search bg-white border-b border-slate-100/80">
-    <ion-searchbar [(ngModel)]="searchTerm" (ionInput)="filterUsers()" placeholder="Search name, flat, mobile..."
-      debounce="150" show-clear-button="focus" class="flex-1 m-0 text-[14px]"></ion-searchbar>
-    <ion-button (click)="openAdd()" class="h-11 m-0 font-bold [--border-radius:14px]" color="primary">
-      <ion-icon name="add" slot="start"></ion-icon>
-      Add
-    </ion-button>
-  </div>
-
-  <div class="px-2 pt-4 bg-[#f8fafc] min-h-full pb-[100px]" *ngIf="filteredUsers.length">
-    <div *ngFor="let u of filteredUsers" class="mb-5">
-      <app-common-card customClass="m-0 border-0 shadow-lg shadow-slate-200/50">
-        <!-- Status Badge top right like the screenshot -->
-        <div slot="header-end"
-          class="rounded-full bg-[#fbbf24] px-[12px] py-[4px] text-[11px] font-bold text-black flex items-center gap-1.5 shadow-sm">
-          <div class="h-1.5 w-1.5 rounded-full bg-white"></div>
-          PENDING
-        </div>
-
-        <div class="flex items-center gap-5 mt-[-10px] mb-6">
-          <ion-avatar class="h-[76px] w-[76px] shrink-0 bg-[#334155] rounded-full p-1 shadow-inner">
-            <img class="h-full rounded-full object-cover" *ngIf="u.photoURL" [src]="u.photoURL" />
-            <div *ngIf="!u.photoURL"
-              class="flex h-full w-full items-center justify-center text-[1.8rem] font-bold text-slate-300">
-              <ion-icon name="person"></ion-icon>
-            </div>
-          </ion-avatar>
-          <div class="min-w-0">
-            <h2 class="m-0 truncate text-[22px] font-extrabold text-slate-900 tracking-tight">{{ u.userName }}</h2>
-            <p class="mt-0.5 text-[15px] font-semibold text-slate-400 capitalize">{{ u.role }}</p>
-          </div>
-        </div>
-
-        <div class="space-y-3 mb-2 ml-1">
-          <div class="flex items-center gap-3.5 text-[15px] text-slate-500 font-semibold" *ngIf="u.flatNumber">
-            <ion-icon name="home-outline" class="text-slate-400 text-[20px]"></ion-icon>
-            <span>Flat {{ u.flatNumber }}</span>
-          </div>
-          <div class="flex items-center gap-3.5 text-[15px] text-slate-500 font-semibold">
-            <ion-icon name="call-outline" class="text-slate-400 text-[20px]"></ion-icon>
-            <span>{{ u.mobileNumber }}</span>
-          </div>
-        </div>
-
-        <!-- Footer exactly matching the screenshot style -->
-        <div slot="footer" class="flex w-full items-center justify-between gap-4 py-2">
-          <button
-            class="flex items-center gap-2 px-4 py-3 text-[15px] font-black text-[#dc2626] bg-transparent border-0 active:scale-95 transition-transform"
-            (click)="confirmDelete(u); $event.stopPropagation()">
-            <ion-icon name="close-circle-outline" class="text-[22px]"></ion-icon>
-            DECLINE
-          </button>
-
-          <button
-            class="flex items-center gap-2 px-8 py-3.5 text-[15px] font-black text-black bg-[#22c55e] rounded-[22px] shadow-[0_10px_20px_-5px_rgba(34,197,94,0.3)] active:scale-95 transition-all"
-            (click)="openEdit(u); $event.stopPropagation()">
-            <ion-icon name="checkmark-circle-outline" class="text-[22px]"></ion-icon>
-            AUTHORIZE
-          </button>
-        </div>
-      </app-common-card>
+    <div class="px-5 pb-3">
+      <app-common-input [(ngModel)]="searchTerm" (ngModelChange)="filterUsers()"
+        placeholder="Search by name, mobile or flat..." iconName="search" customClass="bg-primary-20">
+      </app-common-input>
     </div>
   </div>
 
-
-  <div class="flex flex-col items-center justify-center px-5 py-[50px] text-center text-[var(--ion-color-medium)]"
-    *ngIf="!filteredUsers.length && users.length">
-    <ion-icon name="search-outline" class="mb-4 text-[80px] opacity-30"></ion-icon>
-    <p>No users match your search.</p>
-  </div>
-
-  <div class="flex flex-col items-center justify-center px-5 py-[50px] text-center text-[var(--ion-color-medium)]"
-    *ngIf="!users.length">
-    <ion-icon name="people-outline" class="mb-4 text-[80px] opacity-30"></ion-icon>
-    <h2>No Users Yet</h2>
-    <p>Tap + to add your first user.</p>
-    <ion-button fill="clear" (click)="addDemoResidents()" *ngIf="activeRole === 'resident'">
-      <ion-icon name="flask-outline" slot="start"></ion-icon>
-      Seed Demo Residents
-    </ion-button>
-  </div>
-
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button color="primary" (click)="openAdd()" aria-label="Add user">
-      <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
-
-
-
-  <ion-modal #addModal class="!z-10">
-    <ng-template>
-      <ion-header class="ion-no-border">
-        <ion-toolbar color="primary" class="px-4">
-          <ion-buttons slot="start" class="m-0">
-            <ion-button class="text-white icon-nav-btn" fill="clear" size="small" aria-label="Back"
-              (click)="closeAdd()">
-              <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
+  <div class="px-5 pb-24">
+    <!-- Native Fixed Floating Action Button (Matches Gatekeeper style) -->
+    <button (click)="addUser()" [style.bottom]="'calc(env(safe-area-inset-bottom, 0px) + 24px)'"
+      class="fixed right-5 z-[99] flex h-[56px] w-[56px] items-center justify-center rounded-full bg-primary shadow-[0_6px_16px_rgba(0,0,0,0.15)] transition-transform active:scale-95 sm:bottom-8 sm:right-8 border-0"
+      style="--border-radius: 50%;">
+      <ion-icon name="add" class="text-[32px] text-white"></ion-icon>
+    </button>
+    <div *ngIf="filteredUsers.length" class="space-y-4">
+      <div *ngFor="let user of filteredUsers" class="animate__animated animate__fadeInUp" (click)="viewDetails(user)">
+        <app-common-card customClass="m-0 border-0 shadow-md rounded-[10px]">
+          <div slot="header-end" class="flex gap-2" (click)="$event.stopPropagation()">
+            <ion-button fill="clear" color="primary" class="m-0" (click)="editUser(user)">
+              <ion-icon name="pencil-outline" slot="icon-only" class="text-[18px]"></ion-icon>
             </ion-button>
-          </ion-buttons>
-          <ion-title>Add User</ion-title>
-          <ion-buttons slot="end">
-            <ion-menu-button class="p-0" menu="main-menu" *ngIf="showMenuButton"></ion-menu-button>
-          </ion-buttons>
-        </ion-toolbar>
-      </ion-header>
-      <ion-content class="ion-padding">
-        <app-common-card customClass="m-0">
-          <div class="mb-5">
-            <ion-label
-              class="mb-1.5 ml-1 block text-[0.8rem] font-semibold text-[var(--ion-color-medium)]">Photo</ion-label>
-            <div class="flex items-center gap-3">
-              <ion-avatar class="h-14 w-14 bg-slate-100 relative">
-                <div class="w-full h-full rounded-full">
-                  <img class="w-full h-full object-cover overflow-auto rounded-full" *ngIf="form.photoURL"
-                    [src]="form.photoURL" />
-                  <div *ngIf="!form.photoURL"
-                    class="flex h-full w-full items-center justify-center text-[var(--ion-color-medium)]">
-                    <ion-icon name="add" class="text-lg"></ion-icon>
-                  </div>
-                  <!-- <input class="absolute inset-0 flex items-center justify-center m-auto opacity-0" type="file" accept="image/*" (change)="onPhotoSelected($event, 'add')" /> -->
-                  <app-common-input class="absolute inset-0 flex items-center justify-center m-auto opacity-0"
-                    type="file" accept="image/*" (change)="onPhotoSelected($event, 'add')"> </app-common-input>
+            <ion-button fill="clear" color="danger" class="m-0" (click)="deleteUser(user.id)">
+              <ion-icon name="trash-outline" slot="icon-only" class="text-[18px]"></ion-icon>
+            </ion-button>
+          </div>
 
-                </div>
-              </ion-avatar>
-              <div class="flex-1">
-                <p class="mt-1 text-[12px] text-[var(--ion-color-medium)]">PNG/JPG, will be compressed automatically.
-                </p>
-              </div>
+          <div class="flex items-center gap-4">
+            <ion-avatar class="h-[52px] w-[52px] shrink-0 bg-slate-100 rounded-[16px]">
+              <img class="h-full rounded-[16px]"
+                [src]="user.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg'" />
+            </ion-avatar>
+            <div class="min-w-0">
+              <h2 class="m-0 truncate text-[17px] font-black text-slate-800 tracking-tight leading-tight">{{
+                user.userName }}</h2>
+              <p class="mt-0.5 text-[12px] font-bold text-slate-400 uppercase tracking-widest">
+                {{ user.flatNumber ? 'Flat ' + user.flatNumber : user.role }} • {{ user.mobileNumber }}
+              </p>
             </div>
           </div>
-
-          <div class="mb-4">
-            <ion-label class="mb-1.5 ml-1 block text-[0.8rem] font-semibold text-[var(--ion-color-medium)]">Full
-              Name</ion-label>
-            <div class="flex items-center rounded-[10px] bg-[#f4f5f8] px-3">
-              <ion-icon class="mr-4" name="person-outline"></ion-icon>
-              <ion-input class="flex-1" [(ngModel)]="form.userName" placeholder="John Doe"></ion-input>
-            </div>
-          </div>
-
-          <div class="mb-4">
-            <ion-label class="mb-1.5 ml-1 block text-[0.8rem] font-semibold text-[var(--ion-color-medium)]">Mobile
-              Number</ion-label>
-            <div class="flex items-center rounded-[10px] bg-[#f4f5f8] px-3">
-              <ion-icon class="mr-4" name="phone-portrait-outline"></ion-icon>
-              <ion-input class="flex-1" [(ngModel)]="form.mobileNumber" type="tel" placeholder="9876543210"></ion-input>
-            </div>
-          </div>
-
-          <div class="mb-4" *ngIf="activeRole === 'resident'">
-            <ion-label class="mb-1.5 ml-1 block text-[0.8rem] font-semibold text-[var(--ion-color-medium)]">Flat /
-              Unit Number</ion-label>
-            <app-common-select lines="none" iconName="home-outline" placeholder="Select flat"
-              [(ngModel)]="form.flatNumber" [options]="flatOptionsFormatted">
-            </app-common-select>
-          </div>
-
-          <ion-button expand="block" shape="round" class="h-12 font-semibold [--box-shadow:none]" (click)="addUser()"
-            [disabled]="!isValid()">
-            Save Changes
-          </ion-button>
         </app-common-card>
+      </div>
+    </div>
 
-        <app-common-card customClass="mt-4" cardTitle="Bulk Import"
-          cardSubtitle="Upload a JSON file containing multiple residents." *ngIf="activeRole === 'resident'">
-          <div>
-            <!-- <input type="file" id="fileImport" accept="application/json" (change)="onFileSelected($event)" hidden /> -->
-            <app-common-input type="file" id="fileImport" accept="application/json" (change)="onFileSelected($event)"
-              hidden> </app-common-input>
-            <label for="fileImport"
-              class="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-300 p-[30px] text-[var(--ion-color-medium)]">
-              <ion-icon name="cloud-upload-outline" class="mb-2.5 text-[40px]"></ion-icon>
-              <span>Click to select JSON file</span>
-            </label>
+    <div *ngIf="filteredUsers.length === 0"
+      class="flex flex-col items-center justify-center py-20 text-center opacity-40">
+      <ion-icon name="people-outline" class="text-7xl mb-4"></ion-icon>
+      <h3 class="text-lg font-black text-slate-900 m-0 uppercase">No users found</h3>
+      <p class="text-sm font-bold text-slate-500 m-0 mt-1">Try a different search term.</p>
+    </div>
+  </div>
+
+  <ion-modal [isOpen]="isAddModalOpen" (didDismiss)="isAddModalOpen = false" class="custom-sheet-modal"
+    [breakpoints]="[0, 0.9, 1]" [initialBreakpoint]="0.9">
+    <ng-template>
+      <div class="px-5 py-6 bg-white flex items-center justify-between border-b border-slate-50">
+        <h2 class="m-0 text-[18px] font-black text-slate-900 uppercase tracking-widest">New {{ viewRole }}</h2>
+        <ion-icon name="close-circle" class="text-3xl text-slate-300 cursor-pointer"
+          (click)="isAddModalOpen = false"></ion-icon>
+      </div>
+      <ion-content class="ion-padding" color="light">
+        <app-common-card customClass="m-0 p-6 space-y-5 rounded-[28px] border-0">
+          <app-common-input [(ngModel)]="newUser.userName" label="Full Name" placeholder="Enter guest name"
+            iconName="person">
+          </app-common-input>
+
+          <app-common-input [(ngModel)]="newUser.mobileNumber" label="Mobile Number" placeholder="Enter mobile number"
+            iconName="call" type="tel">
+          </app-common-input>
+
+          <app-common-input *ngIf="viewRole === 'resident'" [(ngModel)]="newUser.flatNumber" label="Flat Number"
+            placeholder="Enter flat (e.g. A-101)" iconName="home">
+          </app-common-input>
+
+          <app-common-input [(ngModel)]="newUser.vehicleNumber" label="Vehicle Number"
+            placeholder="Enter vehicle number" iconName="car-sport">
+          </app-common-input>
+
+          <div class="flex flex-col gap-2">
+            <label class="text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">Profile Photo</label>
+            <div
+              class="h-24 w-24 rounded-3xl bg-primary-20 flex items-center justify-center cursor-pointer overflow-hidden border-2 border-dashed border-primary-40"
+              (click)="takePhoto(true)">
+              <img *ngIf="newUser.photoURL" [src]="newUser.photoURL" class="h-full w-full object-cover" />
+              <ion-icon *ngIf="!newUser.photoURL" name="camera" class="text-3xl text-primary"></ion-icon>
+            </div>
           </div>
+
+          <ion-button expand="block" shape="round" class="h-12 font-semibold [--box-shadow:none]" (click)="saveUser()">
+            {{ isEditing ? 'Update User' : 'Create Account' }}
+          </ion-button>
         </app-common-card>
       </ion-content>
     </ng-template>
   </ion-modal>
 
-  <ion-modal #editModal class="!z-10">
+  <ion-modal [isOpen]="isEditModalOpen" (didDismiss)="isEditModalOpen = false" class="custom-sheet-modal"
+    [breakpoints]="[0, 0.9, 1]" [initialBreakpoint]="0.9">
     <ng-template>
-      <ion-header class="ion-no-border">
-        <ion-toolbar color="primary" class="px-4">
-          <ion-buttons slot="start" class="m-0">
-            <ion-button class="text-white icon-nav-btn" fill="clear" size="small" aria-label="Back"
-              (click)="closeEdit()">
-              <ion-icon name="arrow-back-outline" slot="start"></ion-icon>
-            </ion-button>
-          </ion-buttons>
-          <ion-title>Edit User</ion-title>
-          <ion-buttons slot="end">
-            <ion-menu-button class="p-0" menu="main-menu" *ngIf="showMenuButton"></ion-menu-button>
-          </ion-buttons>
-        </ion-toolbar>
-      </ion-header>
-      <ion-content class="ion-padding">
-        <app-common-card customClass="m-0">
-          <div class="mb-5">
-            <ion-label
-              class="mb-1.5 ml-1 block text-[0.8rem] font-semibold text-[var(--ion-color-medium)]">Photo</ion-label>
-            <div class="flex items-center gap-3">
-              <ion-avatar class="h-14 w-14 bg-slate-100 relative">
-                <img class="w-full h-full object-cover overflow-auto rounded-full" *ngIf="editForm.photoURL"
-                  [src]="editForm.photoURL" />
-                <div *ngIf="!editForm.photoURL"
-                  class="flex h-full w-full items-center justify-center text-[var(--ion-color-medium)]">
-                  <ion-icon name="add" class="text-lg"></ion-icon>
-                </div>
-                <div class="absolute inset-0 h-[15px] w-[15px] flex items-center justify-center m-auto">
-                  <!-- <input class="absolute inset-0 flex items-center justify-center m-auto opacity-0" type="file"
-                      accept="image/*" (change)="onPhotoSelected($event, 'edit')" /> -->
-                  <app-common-input type="file" id="fileImport" accept="application/json"
-                    (change)="onFileSelected($event)" hidden> </app-common-input>
-                </div>
-              </ion-avatar>
-              <div class="flex-1">
-                <p class="mt-1 text-[12px] text-[var(--ion-color-medium)]">PNG/JPG, will be compressed automatically.
-                </p>
-              </div>
-            </div>
-          </div>
+      <div class="px-5 py-6 bg-white flex items-center justify-between border-b border-slate-50">
+        <h2 class="m-0 text-[18px] font-black text-slate-900 uppercase tracking-widest">Edit User</h2>
+        <ion-icon name="close-circle" class="text-3xl text-slate-300 cursor-pointer"
+          (click)="isEditModalOpen = false"></ion-icon>
+      </div>
+      <ion-content class="ion-padding" color="light">
+        <app-common-card customClass="m-0 p-6 space-y-5 rounded-[28px] border-0 shadow-sm">
+          <app-common-input [(ngModel)]="editingUser.userName" label="Full Name" placeholder="Enter name"
+            iconName="person">
+          </app-common-input>
 
-          <div class="mb-4">
-            <ion-label class="mb-1.5 ml-1 block text-[0.8rem] font-semibold text-[var(--ion-color-medium)]">Full
-              Name</ion-label>
-            <div class="flex items-center rounded-[10px] bg-[#f4f5f8] px-3">
-              <ion-icon class="mr-4" name="person-outline"></ion-icon>
-              <ion-input class="flex-1" [(ngModel)]="editForm.userName"></ion-input>
-            </div>
-          </div>
+          <app-common-input [(ngModel)]="editingUser.mobileNumber" label="Mobile Number" placeholder="Enter mobile"
+            iconName="call" type="tel">
+          </app-common-input>
 
-          <div class="mb-4">
-            <ion-label class="mb-1.5 ml-1 block text-[0.8rem] font-semibold text-[var(--ion-color-medium)]">Mobile
-              Number</ion-label>
-            <div class="flex items-center rounded-[10px] bg-[#f4f5f8] px-3">
-              <ion-icon class="mr-4" name="phone-portrait-outline"></ion-icon>
-              <ion-input class="flex-1" [(ngModel)]="editForm.mobileNumber" type="tel"></ion-input>
-            </div>
-          </div>
+          <app-common-input *ngIf="viewRole === 'resident'" [(ngModel)]="editingUser.flatNumber" label="Flat Number"
+            placeholder="Enter flat" iconName="home">
+          </app-common-input>
 
-          <div class="mb-4" *ngIf="editForm.role === 'resident'">
-            <ion-label class="mb-1.5 ml-1 block text-[0.8rem] font-semibold text-[var(--ion-color-medium)]">Flat /
-              Unit Number</ion-label>
-            <app-common-select lines="none" iconName="home-outline" placeholder="Select flat"
-              [(ngModel)]="editForm.flatNumber" [options]="flatOptionsFormatted">
-            </app-common-select>
+          <app-common-input [(ngModel)]="editingUser.vehicleNumber" label="Vehicle Number" placeholder="Enter vehicle"
+            iconName="car-sport">
+          </app-common-input>
+
+          <div class="flex flex-col gap-2">
+            <label class="text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">Profile Photo</label>
+            <div
+              class="h-24 w-24 rounded-3xl bg-primary-20 flex items-center justify-center cursor-pointer overflow-hidden border-2 border-dashed border-primary-40"
+              (click)="takePhoto(false)">
+              <img *ngIf="editingUser.photoURL" [src]="editingUser.photoURL" class="h-full w-full object-cover" />
+              <ion-icon *ngIf="!editingUser.photoURL" name="camera" class="text-3xl text-primary"></ion-icon>
+            </div>
           </div>
 
           <ion-button expand="block" shape="round" class="h-12 font-semibold [--box-shadow:none]" (click)="saveEdit()">
@@ -263,6 +150,89 @@
           </ion-button>
         </app-common-card>
 
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <ion-modal [isOpen]="isDetailsModalOpen" (didDismiss)="isDetailsModalOpen = false" [breakpoints]="[0, 0.9, 1]"
+    [initialBreakpoint]="0.9" class="custom-sheet-modal">
+    <ng-template>
+      <ion-header class="ion-no-border">
+        <div
+          class="px-5 py-5 bg-white flex items-center justify-between border-b border-slate-100/50 shadow-sm relative z-10">
+          <h2 class="m-0 text-[16px] font-black text-slate-800 uppercase tracking-widest">User Details</h2>
+          <ion-icon name="close-circle"
+            class="text-3xl text-rose-500 cursor-pointer active:scale-95 transition-transform"
+            (click)="isDetailsModalOpen = false"></ion-icon>
+        </div>
+      </ion-header>
+
+      <ion-content class="ion-padding" color="light">
+        <div *ngIf="selectedUser" class="flex flex-col items-center">
+          <!-- Profile Section -->
+          <div class="mb-6 mt-4 h-28 w-28 rounded-[32px] bg-indigo-50 overflow-hidden shadow-xl border-4 border-white">
+            <img *ngIf="selectedUser.photoURL" [src]="selectedUser.photoURL" class="h-full w-full object-cover" />
+            <div *ngIf="!selectedUser.photoURL" class="h-full w-full flex items-center justify-center">
+              <ion-icon name="person" class="text-4xl text-indigo-400"></ion-icon>
+            </div>
+          </div>
+
+          <h1 class="m-0 text-xl font-black text-slate-900 text-center leading-tight mb-1">{{ selectedUser.userName }}
+          </h1>
+          <div class="flex items-center gap-2 mb-6">
+            <span
+              class="px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-indigo-100 text-indigo-600 badge-status">
+              {{ selectedUser.role }}
+            </span>
+          </div>
+
+          <div class="w-full space-y-3 pb-12 px-2">
+            <div class="bg-white rounded-[10px] p-4 shadow-sm border border-slate-100">
+              <div class="flex items-center gap-4 mb-4">
+                <div class="h-9 w-9 flex items-center justify-center rounded-xl bg-indigo-50 text-indigo-500">
+                  <ion-icon name="call" class="text-lg"></ion-icon>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="m-0 text-[10px] font-black text-slate-400 uppercase tracking-widest">Mobile Number</p>
+                  <a [href]="'tel:' + selectedUser.mobileNumber"
+                    class="m-0 text-[15px] font-bold text-slate-700 no-underline">
+                    {{ selectedUser.mobileNumber }}
+                  </a>
+                </div>
+              </div>
+
+              <div *ngIf="selectedUser.flatNumber" class="flex items-center gap-4 mb-4">
+                <div class="h-9 w-9 flex items-center justify-center rounded-xl bg-emerald-50 text-emerald-500">
+                  <ion-icon name="home" class="text-lg"></ion-icon>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="m-0 text-[10px] font-black text-slate-400 uppercase tracking-widest">Flat Number</p>
+                  <p class="m-0 text-[15px] font-bold text-slate-700 uppercase">FLAT {{ selectedUser.flatNumber }}</p>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-4" *ngIf="selectedUser.vehicleNumber">
+                <div class="h-9 w-9 flex items-center justify-center rounded-xl bg-rose-50 text-rose-500">
+                  <ion-icon name="car-sport-outline" class="text-lg"></ion-icon>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="m-0 text-[10px] font-black text-slate-400 uppercase tracking-widest">Vehicle Number</p>
+                  <p class="m-0 text-[15px] font-bold text-slate-700 uppercase leading-none">{{
+                    selectedUser.vehicleNumber }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-indigo-600 rounded-[10px] p-5 shadow-xl shadow-indigo-100">
+              <div
+                class="flex items-center justify-between text-white/50 text-[9px] font-black uppercase tracking-widest mb-1.5">
+                <span>Account Created</span>
+                <span>{{ selectedUser.createdAt | date:'mediumDate' }}</span>
+              </div>
+              <p class="m-0 text-white text-xl font-black">{{ selectedUser.uniqueId }}</p>
+            </div>
+          </div>
+        </div>
       </ion-content>
     </ng-template>
   </ion-modal>

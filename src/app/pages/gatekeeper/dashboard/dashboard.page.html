@@ -13,8 +13,9 @@
     (selectedDateChange)="onSelectedDateChange($event)" (tabChange)="onTabChange($event)"
     class="block sticky top-0 bg-white shadow-sm z-20 mb-4"></visit-calendar>
 
-  <div class="px-3 space-y-4 pb-32">
-    <div *ngFor="let visitor of visitorsForSelectedDate$ | async" class="animate__animated animate__fadeInUp">
+  <div *ngIf="(visitorsForSelectedDate$ | async)?.length" class="px-3 space-y-4 pb-32">
+    <div *ngFor="let visitor of visitorsForSelectedDate$ | async" class="animate__animated animate__fadeInUp"
+      (click)="viewVisitorDetails(visitor)">
       <app-common-card customClass="m-0" [color]="getStatusColor(visitor.status)">
         <div slot="header-end" class="rounded-full px-3 py-1 text-[11px] font-bold flex items-center gap-1.5" [ngClass]="{
                 'bg-yellow-100 text-yellow-600': visitor.status === 'pending',
@@ -34,7 +35,9 @@
         </div>
 
         <div class="flex items-center gap-4 mb-4">
-          <ion-avatar class="h-[52px] w-[52px] shrink-0 bg-slate-100 rounded-[16px]">
+          <app-common-qr *ngIf="visitor.qrToken" [value]="visitor.qrToken" [size]="52"
+            (qrClick)="showFullQr($event)"></app-common-qr>
+          <ion-avatar *ngIf="!visitor.qrToken" class="h-[52px] w-[52px] shrink-0 bg-slate-100 rounded-[16px]">
             <img class="h-full rounded-[16px]"
               [src]="visitor.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg'" />
           </ion-avatar>
@@ -59,14 +62,14 @@
         <div slot="footer" class="w-full mt-4" *ngIf="visitor.status === 'approved' || visitor.status === 'checked-in'">
           <button *ngIf="visitor.status === 'approved'"
             class="w-full flex items-center justify-center gap-2 px-6 py-3 text-[14px] font-bold text-white bg-green-500 rounded-2xl shadow-lg shadow-green-500/20 active:scale-[0.98] transition-all"
-            (click)="onCheckIn(visitor.id)">
+            (click)="$event.stopPropagation(); onCheckIn(visitor.id)">
             <ion-icon name="checkmark-circle-outline" class="text-xl"></ion-icon>
             CHECK IN VISITOR
           </button>
 
           <button *ngIf="visitor.status === 'checked-in'"
             class="w-full flex items-center justify-center gap-2 px-6 py-3 text-[14px] font-bold text-white bg-red-500 rounded-2xl shadow-lg shadow-red-500/20 active:scale-[0.98] transition-all"
-            (click)="onCheckOut(visitor.id)">
+            (click)="$event.stopPropagation(); onCheckOut(visitor.id)">
             <ion-icon name="log-out-outline" class="text-xl"></ion-icon>
             CHECK OUT VISITOR
           </button>
@@ -75,11 +78,41 @@
     </div>
   </div>
 
-  <div *ngIf="(visitorsForSelectedDate$ | async)?.length === 0" class="px-5 py-10 text-center text-slate-400">
-    <ion-icon name="document-text-outline" class="mb-2 text-5xl opacity-30"></ion-icon>
-    <p>No visitor requests yet</p>
+  <div *ngIf="(visitorsForSelectedDate$ | async)?.length === 0"
+    class="flex flex-col items-center justify-center h-[40vh] px-5 text-center text-slate-400">
+    <ion-icon name="document-text-outline" class="mb-3 text-6xl opacity-30"></ion-icon>
+    <p class="text-[15px] font-bold">No visitor requests yet</p>
   </div>
 </ion-content>
+
+<!-- Modals outside ion-content -->
+<ion-modal [isOpen]="isDetailsModalOpen" (didDismiss)="isDetailsModalOpen = false" [breakpoints]="[0, 0.85]"
+  [initialBreakpoint]="0.85" class="custom-sheet-modal">
+  <ng-template>
+    <app-common-visitor-details [visitor]="selectedVisitor" (qrClick)="showFullQr($event)"
+      (close)="isDetailsModalOpen = false"></app-common-visitor-details>
+  </ng-template>
+</ion-modal>
+
+<ion-modal [isOpen]="isQrModalOpen" (didDismiss)="isQrModalOpen = false" class="qr-fullview-modal">
+  <ng-template>
+    <div class="flex flex-col items-center justify-center h-full p-8 bg-slate-900/40 backdrop-blur-xl"
+      (click)="isQrModalOpen = false">
+      <div class="bg-white p-8 rounded-[48px] shadow-2xl animate__animated animate__zoomIn"
+        (click)="$event.stopPropagation()">
+        <app-common-qr [value]="qrTokenForLargeView" [size]="280"></app-common-qr>
+        <p class="mt-8 mb-2 text-center text-slate-400 font-bold tracking-widest uppercase text-[11px]">ACCESS PASS
+        </p>
+        <div class="text-center font-black text-slate-800 text-lg uppercase tracking-tight">{{ qrTokenForLargeView
+          }}</div>
+      </div>
+      <button (click)="isQrModalOpen = false"
+        class="mt-12 h-14 w-14 rounded-full bg-white/20 text-white flex items-center justify-center border-0 cursor-pointer active:scale-90 transition-transform">
+        <ion-icon name="close" class="text-3xl"></ion-icon>
+      </button>
+    </div>
+  </ng-template>
+</ion-modal>
 
 <!-- Native Fixed Floating Action Button (Replaces ion-fab) -->
 <ion-button (click)="onNewEntry()" [style.bottom]="'calc(env(safe-area-inset-bottom, 0px) + 24px)'"

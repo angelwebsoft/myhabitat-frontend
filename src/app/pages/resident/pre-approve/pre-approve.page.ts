@@ -21,6 +21,7 @@ export class PreApprovePage {
   guest = {
     visitorName: '',
     mobile: '',
+    vehicleNumber: '',
     validDate: new Date().toISOString(),
   };
 
@@ -56,6 +57,7 @@ export class PreApprovePage {
       const created = await this.dataService.addPreApprovedGuest({
         visitorName: this.guest.visitorName,
         mobile: this.guest.mobile,
+        vehicleNumber: this.guest.vehicleNumber.trim() || undefined,
         validDate: new Date(this.guest.validDate),
         residentId: user.id,
         societyId: user.societyId

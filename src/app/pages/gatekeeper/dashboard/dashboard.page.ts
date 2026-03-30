@@ -1,5 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { DataService } from '../../../services/data.service';
@@ -14,12 +14,15 @@ import { CommonInputComponent } from '../../../components/common-input/common-in
 import { CommonButtonComponent } from 'src/app/components/common-button/common-button.component';
 import { CommonCardComponent } from '../../../components/common-card/common-card.component';
 import { DashboardHeaderComponent } from '../../../components/dashboard-header/dashboard-header.component';
+import { CommonQrComponent } from '../../../components/common-qr/common-qr.component';
+import { CommonVisitorDetailsComponent } from '../../../components/common-visitor-details/common-visitor-details.component';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-gatekeeper-dashboard',
   templateUrl: './dashboard.page.html',
   standalone: true,
-  imports: [CommonModule, IonicModule, AppHeaderComponent, VisitCalendarComponent, CommonInputComponent, FormsModule, CommonButtonComponent, CommonCardComponent, DashboardHeaderComponent],
+  imports: [CommonModule, IonicModule, AppHeaderComponent, VisitCalendarComponent, CommonInputComponent, FormsModule, CommonButtonComponent, CommonCardComponent, DashboardHeaderComponent, CommonQrComponent, CommonVisitorDetailsComponent],
   host: { 'class': 'gatekeeper-theme flex flex-col min-h-full' }
 })
 export class GatekeeperDashboardPage implements OnInit {
@@ -31,17 +34,38 @@ export class GatekeeperDashboardPage implements OnInit {
   private currentGatekeeperId = '';
   selectedDate = this.toLocalIsoDate(new Date());
   private selectedDate$ = new BehaviorSubject<string>(this.selectedDate);
-  private selectedTab$ = new BehaviorSubject<'all' | 'walk-in' | 'pre-approved'>('all');
+  private selectedTab$ = new BehaviorSubject<'upcoming' | 'walk-in' | 'pre-approved'>('upcoming');
   private searchTerm$ = new BehaviorSubject<string>('');
   searchTerm: string = '';
-
-  onTabChange(tab: 'all' | 'walk-in' | 'pre-approved') {
-    this.selectedTab$.next(tab);
-  }
+  selectedVisitor: Visitor | null = null;
+  isDetailsModalOpen = false;
+  isQrModalOpen = false;
+  qrTokenForLargeView = '';
 
   private dataService = inject(DataService);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private location = inject(Location);
+
+  constructor() { }
+
+  onTabChange(tab: 'upcoming' | 'walk-in' | 'pre-approved') {
+    this.selectedTab$.next(tab);
+  }
+
+  viewVisitorDetails(visitor: Visitor) {
+    this.selectedVisitor = visitor;
+    this.isDetailsModalOpen = true;
+  }
+
+  showFullQr(token: string) {
+    this.qrTokenForLargeView = token;
+    this.isQrModalOpen = true;
+  }
+
+  closeQrModal() {
+    this.isQrModalOpen = false;
+  }
 
   currentUser$ = this.authService.currentUser$;
 
@@ -58,22 +82,45 @@ export class GatekeeperDashboardPage implements OnInit {
       this.currentSocietyId = user.societyId;
       this.currentGatekeeperId = user.id;
 
-      const visitorsStream = await this.dataService.getVisitorsBySociety(user.societyId, undefined, user.id);
+      const visitorsStream = await this.dataService.getVisitorsBySociety(user.societyId);
       this.visitors$ = visitorsStream.pipe(
         map(list => [...list].sort((a, b) => this.getStatusPriority(a.status) - this.getStatusPriority(b.status)))
       );
 
       this.visitorsForSelectedDate$ = combineLatest([this.visitors$, this.selectedDate$, this.searchTerm$, this.selectedTab$]).pipe(
         map(([list, selectedDate, searchTerm, tab]) => {
-          let filtered = [...list].filter((v) => this.toLocalIsoDate(this.getVisitorDate(v)) === selectedDate);
-          if (searchTerm) {
-            filtered = filtered.filter(v => v.visitorName.toLowerCase().includes(searchTerm.toLowerCase()) || v.mobile?.includes(searchTerm));
-          }
-          if (tab === 'walk-in') {
-            filtered = filtered.filter(v => v.purpose !== 'Pre-Approved Guest');
+          const today = this.toLocalIsoDate(new Date());
+          let filtered = [...list];
+
+          // 1. Tab/Date Filter
+          if (tab === 'upcoming') {
+            filtered = filtered.filter(v =>
+              v.purpose === 'Pre-Approved Guest' &&
+              v.status === 'pending' &&
+              this.toLocalIsoDate(this.getVisitorDate(v)) >= today
+            );
+          } else if (tab === 'walk-in') {
+            filtered = filtered.filter(v =>
+              this.toLocalIsoDate(this.getVisitorDate(v)) === selectedDate &&
+              v.purpose !== 'Pre-Approved Guest'
+            );
           } else if (tab === 'pre-approved') {
-            filtered = filtered.filter(v => v.purpose === 'Pre-Approved Guest');
+            filtered = filtered.filter(v =>
+              this.toLocalIsoDate(this.getVisitorDate(v)) === selectedDate &&
+              v.purpose === 'Pre-Approved Guest'
+            );
           }
+
+          // 2. Search Filter
+          if (searchTerm) {
+            const s = searchTerm.toLowerCase();
+            filtered = filtered.filter(v =>
+              v.visitorName.toLowerCase().includes(s) ||
+              v.mobile?.includes(s) ||
+              v.vehicleNumber?.toLowerCase().includes(s)
+            );
+          }
+
           return filtered.sort((a, b) => this.getVisitorDate(b).getTime() - this.getVisitorDate(a).getTime());
         })
       );
@@ -90,6 +137,15 @@ export class GatekeeperDashboardPage implements OnInit {
       this.dataService.refreshVisitorsForSociety(this.currentSocietyId).catch(error => {
         console.error('Failed to refresh gatekeeper visitors on enter', error);
       });
+    }
+
+    // Checking strictly inside ionViewWillEnter handles Ionic's cached page routing
+    const state = this.location.getState() as any;
+    if (state && state['openVisitor']) {
+      this.selectedVisitor = state['openVisitor'];
+      this.isDetailsModalOpen = true;
+      // Clear the state so it doesn't blindly trigger again if we re-visit the dashboard from somewhere else
+      this.location.replaceState('/gatekeeper', '', null);
     }
   }
 

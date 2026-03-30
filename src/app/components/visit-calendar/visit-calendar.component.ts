@@ -5,15 +5,16 @@ import { IonicModule } from '@ionic/angular';
 import { Visitor } from '../../models/visitor.model';
 import { CommonInputComponent } from '../common-input/common-input.component';
 import { CommonButtonComponent } from '../common-button/common-button.component';
+import { CommonQrComponent } from '../common-qr/common-qr.component';
 
 @Component({
   selector: 'visit-calendar',
   standalone: true,
-  imports: [CommonModule, IonicModule, NgIf, NgFor, DatePipe, FormsModule, CommonInputComponent, CommonButtonComponent],
+  imports: [CommonModule, IonicModule, NgIf, NgFor, DatePipe, FormsModule, CommonInputComponent, CommonButtonComponent, CommonQrComponent],
   styles: [],
   templateUrl: './visit-calendar.component.html',
 })
-export class VisitCalendarComponent implements OnChanges {
+export class VisitCalendarComponent implements OnInit, OnChanges {
   @Input() visitors: Visitor[] = [];
   @Input() title = 'Calendar Visits';
   @Input() subtitle = 'Select a date to see visits';
@@ -22,19 +23,28 @@ export class VisitCalendarComponent implements OnChanges {
   @Input() selectedDate?: string;
 
   @Output() selectedDateChange = new EventEmitter<string>();
-  @Output() tabChange = new EventEmitter<'all' | 'walk-in' | 'pre-approved'>();
+  @Output() tabChange = new EventEmitter<'upcoming' | 'walk-in' | 'pre-approved'>();
+  @Output() visitorClicked = new EventEmitter<Visitor>();
+  @Output() qrClicked = new EventEmitter<string>();
 
   highlightedDates: any[] = [];
   selectedDateInternal = '';
   filteredVisitors: Visitor[] = [];
   isCalendarOpen = false;
   readonly triggerId = `visit-cal-trigger-${Math.random().toString(36).slice(2)}`;
-  selectedTab: 'all' | 'walk-in' | 'pre-approved' = 'all';
-  tabs: { label: string; value: 'all' | 'walk-in' | 'pre-approved' }[] = [
-    { label: 'All', value: 'all' },
+  selectedTab: 'upcoming' | 'walk-in' | 'pre-approved' = 'upcoming';
+  tabs: { label: string; value: 'upcoming' | 'walk-in' | 'pre-approved' }[] = [
+    { label: 'Upcoming', value: 'upcoming' },
     { label: 'Walk-In', value: 'walk-in' },
-    { label: 'Approved', value: 'pre-approved' }
+    { label: 'Pre Approved', value: 'pre-approved' }
   ];
+
+  ngOnInit() {
+    if (!this.selectedDateInternal) {
+      this.selectedDateInternal = this.toLocalIsoDate(new Date());
+    }
+    this.applyFilter();
+  }
 
 
 
@@ -48,6 +58,11 @@ export class VisitCalendarComponent implements OnChanges {
     }
 
     return d.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' });
+  }
+
+  get totalVisitsForDay(): number {
+    const selected = this.currentSelectedDate;
+    return (this.visitors ?? []).filter(v => this.toLocalIsoDate(this.getVisitorDate(v)) === selected).length;
   }
 
   get highlightedVisitsDates() {
@@ -102,7 +117,7 @@ export class VisitCalendarComponent implements OnChanges {
     this.isCalendarOpen = false;
   }
 
-  changeTab(tab: 'all' | 'walk-in' | 'pre-approved') {
+  changeTab(tab: 'upcoming' | 'walk-in' | 'pre-approved') {
     this.selectedTab = tab;
     this.tabChange.emit(tab);
     this.applyFilter();
@@ -110,13 +125,28 @@ export class VisitCalendarComponent implements OnChanges {
 
   private applyFilter() {
     const selected = this.currentSelectedDate;
-    let list = (this.visitors ?? [])
-      .filter((v) => this.toLocalIsoDate(this.getVisitorDate(v)) === selected);
+    const today = this.toLocalIsoDate(new Date());
+    let list = (this.visitors ?? []);
 
-    if (this.selectedTab === 'walk-in') {
-      list = list.filter(v => v.purpose !== 'Pre-Approved Guest');
+    if (this.selectedTab === 'upcoming') {
+      // Ignore selected calendar date, show all future pre-approvals
+      list = list.filter(v =>
+        v.purpose === 'Pre-Approved Guest' &&
+        v.status === 'pending' &&
+        this.toLocalIsoDate(this.getVisitorDate(v)) >= today
+      );
+    } else if (this.selectedTab === 'walk-in') {
+      // Only selected date & not pre-approved
+      list = list.filter(v =>
+        this.toLocalIsoDate(this.getVisitorDate(v)) === selected &&
+        v.purpose !== 'Pre-Approved Guest'
+      );
     } else if (this.selectedTab === 'pre-approved') {
-      list = list.filter(v => v.purpose === 'Pre-Approved Guest');
+      // Only selected date & pre-approved
+      list = list.filter(v =>
+        this.toLocalIsoDate(this.getVisitorDate(v)) === selected &&
+        v.purpose === 'Pre-Approved Guest'
+      );
     }
 
     this.filteredVisitors = list.sort((a, b) => this.getVisitorDate(b).getTime() - this.getVisitorDate(a).getTime());

@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { IonicModule, LoadingController, ToastController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { AppHeaderComponent } from '../../../components/app-header/app-header.component';
-import { CommonCardComponent } from '../../../components/common-card/common-card.component';
 import { CommonInputComponent } from '../../../components/common-input/common-input.component';
 import { CommonSelectComponent } from '../../../components/common-select/common-select.component';
 import { DataService } from '../../../services/data.service';
@@ -14,7 +13,7 @@ import { FormsModule } from '@angular/forms';
   selector: 'app-gatekeeper-new-visitor',
   templateUrl: './new-visitor.page.html',
   standalone: true,
-  imports: [CommonModule, IonicModule, AppHeaderComponent, CommonCardComponent, CommonInputComponent, CommonSelectComponent, FormsModule]
+  imports: [CommonModule, IonicModule, AppHeaderComponent, CommonInputComponent, CommonSelectComponent, FormsModule]
 })
 export class NewVisitorPage implements OnInit {
   private dataService = inject(DataService);
@@ -27,6 +26,7 @@ export class NewVisitorPage implements OnInit {
     visitorName: '',
     mobile: '',
     flatNumber: '',
+    vehicleNumber: '',
     purpose: '',
     photoURL: ''
   };
@@ -72,6 +72,7 @@ export class NewVisitorPage implements OnInit {
         visitorName: this.form.visitorName,
         mobile: this.form.mobile,
         flatNumber: this.form.flatNumber,
+        vehicleNumber: this.form.vehicleNumber.trim() || undefined,
         purpose: this.form.purpose,
         photoURL: this.form.photoURL,
         societyId: user.societyId,

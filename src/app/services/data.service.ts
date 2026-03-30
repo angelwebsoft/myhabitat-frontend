@@ -6,6 +6,7 @@ import { NotificationService } from './notification.service';
 import { ApiService } from './api.service';
 import { AuthService } from './auth.service';
 import { RealtimeService } from './realtime.service';
+import * as QRCode from 'qrcode';
 
 @Injectable({
     providedIn: 'root'
@@ -13,6 +14,7 @@ import { RealtimeService } from './realtime.service';
 export class DataService {
     private visitors: Visitor[] = [];
     private residents: User[] = [];
+    private preApproved: PreApprovedGuest[] = [];
 
     private visitors$ = new BehaviorSubject<Visitor[]>([]);
     private residents$ = new BehaviorSubject<User[]>([]);
@@ -24,6 +26,8 @@ export class DataService {
 
     private stopVisitorCreatedListener?: () => void;
     private stopVisitorUpdatedListener?: () => void;
+    private stopPreApprovedCreatedListener?: () => void;
+    private stopPreApprovedUsedListener?: () => void;
 
     constructor() {
         this.initRealtime();
@@ -35,12 +39,18 @@ export class DataService {
                 this.realtimeService.disconnect();
                 this.stopVisitorCreatedListener?.();
                 this.stopVisitorUpdatedListener?.();
+                this.stopPreApprovedCreatedListener?.();
+                this.stopPreApprovedUsedListener?.();
                 this.stopVisitorCreatedListener = undefined;
                 this.stopVisitorUpdatedListener = undefined;
+                this.stopPreApprovedCreatedListener = undefined;
+                this.stopPreApprovedUsedListener = undefined;
                 return;
             }
 
             this.realtimeService.connect(user.societyId);
+            this.refreshResidents(user.societyId).catch(console.error);
+            this.refreshVisitors(user.societyId).catch(console.error);
 
             if (!this.stopVisitorCreatedListener) {
                 this.stopVisitorCreatedListener = this.realtimeService.onVisitorCreated((visitor) => {
@@ -61,7 +71,29 @@ export class DataService {
                     this.upsertVisitor(visitor);
                 });
             }
+
+            if (!this.stopPreApprovedCreatedListener) {
+                this.stopPreApprovedCreatedListener = this.realtimeService.onPreApprovedCreated((guest) => {
+                    this.upsertPreApproved(guest);
+                });
+            }
+
+            if (!this.stopPreApprovedUsedListener) {
+                this.stopPreApprovedUsedListener = this.realtimeService.onPreApprovedUsed((guest) => {
+                    this.upsertPreApproved(guest);
+                });
+            }
         });
+    }
+
+    private upsertPreApproved(guest: PreApprovedGuest) {
+        const index = this.preApproved.findIndex(g => g.id === guest.id);
+        if (index >= 0) {
+            this.preApproved[index] = { ...this.preApproved[index], ...guest };
+        } else {
+            this.preApproved.unshift(guest);
+        }
+        this.emitMergedVisitors();
     }
 
     private upsertVisitor(visitor: Visitor) {
@@ -73,19 +105,45 @@ export class DataService {
         } else {
             this.visitors.unshift(visitor);
         }
-        this.emitVisitors();
+        this.emitMergedVisitors();
     }
 
     private saveVisitors() {
-        this.emitVisitors();
+        this.emitMergedVisitors();
     }
 
     private saveResidents() {
         this.emitResidents();
     }
 
-    private emitVisitors() {
-        this.visitors$.next([...this.visitors]);
+    private emitMergedVisitors() {
+        // Map pre-approved guests to "Pseudo-Visitors" so they show in listings
+        const pseudoVisitors: Visitor[] = this.preApproved
+            .filter(g => g.status === 'pending')
+            .map(g => {
+                const resident = this.residents.find(r => r.id === g.residentId);
+                return {
+                    id: g.id,
+                    qrToken: g.qrToken,
+                    visitorName: g.visitorName,
+                    mobile: g.mobile,
+                    flatNumber: resident?.flatNumber || '?',
+                    purpose: 'Pre-Approved Guest',
+                    vehicleNumber: g.vehicleNumber,
+                    photoURL: '',
+                    status: 'pending',
+                    checkInTime: g.validDate, // Using validDate as primary time for calendar
+                    checkOutTime: null,
+                    gatekeeperId: '',
+                    residentId: g.residentId,
+                    societyId: g.societyId,
+                    createdAt: g.createdAt || g.validDate
+                };
+            });
+
+        // Combine and dedup (Visitor record takes precedence if it exists for same guest via consumer logic)
+        const combined = [...this.visitors, ...pseudoVisitors];
+        this.visitors$.next(combined);
     }
 
     private emitResidents() {
@@ -94,6 +152,22 @@ export class DataService {
 
     private generateId(prefix: string) {
         return `${prefix}${Date.now().toString(36)}${Math.random().toString(36).substring(2, 8)}`;
+    }
+
+    async generateQrDataUrl(text: string): Promise<string> {
+        try {
+            return await QRCode.toDataURL(text, {
+                width: 400,
+                margin: 2,
+                color: {
+                    dark: '#0f172a',
+                    light: '#ffffff'
+                }
+            });
+        } catch {
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><rect width="100%" height="100%" fill="white"/><text x="20" y="50" font-size="20" font-weight="bold" fill="#0f172a">Token: ${text}</text></svg>`;
+            return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+        }
     }
 
     private async refreshResidents(societyId: string, role: User['role'] = 'resident') {
@@ -120,8 +194,13 @@ export class DataService {
     }
 
     private async refreshVisitors(societyId: string) {
-        const visitors = await firstValueFrom(this.apiService.getVisitorsByQuery({ societyId }));
+        const [visitors, pre] = await Promise.all([
+            firstValueFrom(this.apiService.getVisitorsByQuery({ societyId })),
+            firstValueFrom(this.apiService.getPreApproved({ societyId, status: 'pending' }))
+        ]);
+
         this.visitors = visitors;
+        this.preApproved = pre;
         this.saveVisitors();
         return visitors;
     }
@@ -209,6 +288,7 @@ export class DataService {
             residentId: guest.residentId,
             visitorName: guest.visitorName,
             mobile: guest.mobile,
+            vehicleNumber: guest.vehicleNumber,
             validDate: guest.validDate,
             societyId: guest.societyId,
             status: 'pending'
@@ -222,7 +302,17 @@ export class DataService {
     }
 
     async consumePreApprovedByQr(qrToken: string, gatekeeperId: string) {
-        return await firstValueFrom(this.apiService.consumePreApproved({ qrToken, gatekeeperId }));
+        const response = await firstValueFrom(this.apiService.consumePreApproved({ qrToken, gatekeeperId }));
+
+        // Immediately update local UI stores for instant feedback
+        if (response.guest) {
+            this.upsertPreApproved(response.guest);
+        }
+        if (response.visitor) {
+            this.upsertVisitor(response.visitor);
+        }
+
+        return response;
     }
 
     async listPreApprovedForResident(societyId: string, residentId: string) {

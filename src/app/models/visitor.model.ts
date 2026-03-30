@@ -14,6 +14,7 @@ export interface User {
   role: 'admin' | 'resident' | 'gatekeeper';
   photoURL?: string;
   flatNumber?: string;
+  vehicleNumber?: string;
   societyId: string;
   fcmToken?: string;
   createdAt: any;
@@ -23,10 +24,12 @@ export interface User {
 
 export interface Visitor {
   id: string;
+  qrToken?: string; // Add this
   visitorName: string;
   mobile: string;
   flatNumber: string;
   purpose: string;
+  vehicleNumber?: string;
   photoURL: string;
   status: 'pending' | 'approved' | 'rejected' | 'checked-in' | 'checked-out';
   checkInTime: any | null;
@@ -43,6 +46,7 @@ export interface PreApprovedGuest {
   residentId: string;
   visitorName: string;
   mobile: string;
+  vehicleNumber?: string;
   validDate: any;
   societyId: string;
   status: 'pending' | 'used';

@@ -1,0 +1,110 @@
+<ion-header class="ion-no-border" *ngIf="visitor">
+    <div
+        class="px-5 py-5 bg-white flex items-center justify-between border-b border-slate-100/50 shadow-sm relative z-10">
+        <h2 class="m-0 text-[16px] font-black text-slate-800 uppercase tracking-widest">Entry Details</h2>
+        <ion-icon name="close-circle" class="text-3xl text-rose-500 cursor-pointer active:scale-95 transition-transform"
+            (click)="onClose()"></ion-icon>
+    </div>
+</ion-header>
+
+<ion-content class="ion-padding" color="light" *ngIf="visitor">
+    <div class="flex flex-col items-center">
+        <!-- Profile Section -->
+        <div class="mb-6 mt-4 relative h-28 w-28 flex items-center justify-center">
+            <div *ngIf="!visitor.qrToken"
+                class="h-28 w-28 rounded-[32px] bg-indigo-50 overflow-hidden shadow-xl border-4 border-white">
+                <img *ngIf="visitor.photoURL" [src]="visitor.photoURL" class="h-full w-full object-cover" />
+                <div *ngIf="!visitor.photoURL" class="h-full w-full flex items-center justify-center">
+                    <ion-icon name="person" class="text-4xl text-indigo-400"></ion-icon>
+                </div>
+            </div>
+            <div *ngIf="visitor.qrToken" class="p-1.5 bg-white rounded-[24px] shadow-xl border border-slate-100"
+                (click)="onQrClick(visitor.qrToken)">
+                <app-common-qr [value]="visitor.qrToken" [size]="100"></app-common-qr>
+            </div>
+        </div>
+
+        <h1 class="m-0 text-xl font-black text-slate-900 text-center leading-tight mb-1">{{ visitor.visitorName }}</h1>
+
+        <div class="flex items-center gap-2 mb-6">
+            <span class="px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest badge-status"
+                [ngClass]="{
+                'bg-yellow-100 text-yellow-600': visitor.status === 'pending',
+                'bg-green-100 text-green-600': visitor.status === 'approved' || visitor.status === 'checked-in',
+                'bg-red-100 text-red-600': visitor.status === 'rejected',
+                'bg-gray-100 text-gray-600': visitor.status === 'checked-out'
+            }">{{ visitor.status === 'checked-in' ? 'Inside' : (visitor.status === 'checked-out' ? 'Completed' :
+                visitor.status) }}</span>
+        </div>
+
+        <!-- Detail Section -->
+        <div class="w-full space-y-3 pb-12 px-4">
+            <div class="bg-white rounded-[10px] p-4 shadow-sm border border-slate-100">
+                <!-- Mobile -->
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="h-9 w-9 flex items-center justify-center rounded-xl bg-indigo-50 text-indigo-500">
+                        <ion-icon name="call" class="text-lg"></ion-icon>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="m-0 text-[10px] font-black text-slate-400 uppercase tracking-widest">Mobile Number</p>
+                        <a [href]="'tel:' + visitor.mobile"
+                            class="m-0 text-[15px] font-bold text-slate-700 no-underline">{{ visitor.mobile }}</a>
+                    </div>
+                </div>
+
+                <!-- Flat -->
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="h-9 w-9 flex items-center justify-center rounded-xl bg-emerald-50 text-emerald-500">
+                        <ion-icon name="home" class="text-lg"></ion-icon>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="m-0 text-[10px] font-black text-slate-400 uppercase tracking-widest">Flat Number</p>
+                        <p class="m-0 text-[15px] font-bold text-slate-700 uppercase">FLAT {{ visitor.flatNumber }}</p>
+                    </div>
+                </div>
+
+                <!-- Vehicle -->
+                <div class="flex items-center gap-4 mb-4" *ngIf="visitor.vehicleNumber">
+                    <div class="h-9 w-9 flex items-center justify-center rounded-xl bg-rose-50 text-rose-500">
+                        <ion-icon name="car-sport-outline" class="text-lg"></ion-icon>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="m-0 text-[10px] font-black text-slate-400 uppercase tracking-widest">Vehicle Number
+                        </p>
+                        <p class="m-0 text-[15px] font-bold text-slate-700 uppercase leading-none">{{
+                            visitor.vehicleNumber }}</p>
+                    </div>
+                </div>
+
+                <!-- Purpose -->
+                <div class="flex items-center gap-4">
+                    <div class="h-9 w-9 flex items-center justify-center rounded-xl bg-blue-50 text-blue-500">
+                        <ion-icon name="document-text" class="text-lg"></ion-icon>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="m-0 text-[10px] font-black text-slate-400 uppercase tracking-widest">Purpose</p>
+                        <p class="m-0 text-[15px] font-bold text-slate-700 leading-none truncate">{{ visitor.purpose }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Log Card -->
+            <div class="bg-indigo-600 rounded-[10px] p-5 shadow-xl shadow-indigo-100">
+                <div
+                    class="flex items-center justify-between text-white/50 text-[9px] font-black uppercase tracking-widest mb-1.5">
+                    <span>Registry Record</span>
+                    <span>{{ (visitor.checkInTime || visitor.createdAt) | date:'mediumDate' }}</span>
+                </div>
+                <p class="m-0 text-white text-xl font-black">{{ (visitor.checkInTime || visitor.createdAt) |
+                    date:'shortTime' }}</p>
+            </div>
+        </div>
+    </div>
+</ion-content>
+
+<!-- Loading State fallback -->
+<div *ngIf="!visitor" class="h-full w-full flex flex-col items-center justify-center bg-slate-50 p-12">
+    <ion-spinner name="crescent" color="primary" class="mb-4"></ion-spinner>
+    <p class="text-slate-400 font-bold uppercase tracking-widest text-[9px]">Loading entry details...</p>
+</div>

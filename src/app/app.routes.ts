@@ -67,6 +67,12 @@ export const routes: Routes = [
     canActivate: [roleGuard],
     data: { role: 'admin', viewRole: 'admin' }
   },
+  {
+    path: 'admin/visitors',
+    loadComponent: () => import('./pages/admin/visitors/visitors.page').then(m => m.AdminVisitorsPage),
+    canActivate: [roleGuard],
+    data: { role: 'admin' }
+  },
   // Backward-compatible routes (redirect to new URLs)
   {
     path: 'admin/residents',

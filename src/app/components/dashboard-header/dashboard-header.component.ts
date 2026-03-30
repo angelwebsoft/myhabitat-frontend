@@ -18,6 +18,7 @@ export class DashboardHeaderComponent {
     @Input() label = '';
     @Input() welcomeSubtitle = 'Manage your operations';
     @Input() searchPlaceholder = 'Search requests...';
+    @Input() showSearch = true;
 
     searchTerm: string = '';
 

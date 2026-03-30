@@ -14,7 +14,7 @@
             <!-- Right: Badge / Indicator -->
             <div class="flex items-center gap-2">
                 <div class="rounded-full bg-primary-20 px-4 py-2 text-[12px] font-black text-primary">
-                    {{ filteredVisitors.length }} {{ filteredVisitors.length === 1 ? 'Visit' : 'Visits' }}
+                    {{ totalVisitsForDay }} {{ totalVisitsForDay === 1 ? 'Visit' : 'Visits' }}
                 </div>
                 <!-- <ion-icon name="chevron-down" class="text-slate-300 text-[18px] mt-0.5"></ion-icon> -->
             </div>
@@ -39,26 +39,40 @@
             </ion-content>
         </ng-template>
     </ion-modal>
-    <div class="px-4 flex gap-3 mb-4 bg-white py-5 pt-3 items-center">
+    <div class="px-4 flex gap-3 mb-4 bg-white py-5 pt-3 items-center overflow-x-auto no-scrollbar scroll-smooth">
         <button *ngFor="let tab of tabs" (click)="changeTab(tab.value)"
-            class="flex-1 px-4 py-3 rounded-2xl text-[11px] font-black transition-all border-0 cursor-pointer"
-            [ngClass]="selectedTab === tab.value ? 'bg-primary text-white shadow-lg shadow-indigo-500/30' : 'bg-primary-20 capitalize'">
+            class="whitespace-nowrap shrink-0 px-6 py-3 rounded-2xl text-[11px] font-black transition-all border-0 cursor-pointer"
+            [ngClass]="selectedTab === tab.value ? 'bg-primary text-white shadow-lg shadow-indigo-500/30' : 'bg-primary-20 text-slate-600 capitalize'">
             {{ tab.label }}
         </button>
     </div>
 </div>
 <ng-container *ngIf="showList">
     <div class="space-y-4 pb-10 px-4">
-        <div *ngFor="let v of filteredVisitors"
-            class="flex items-center justify-between px-4 py-2 bg-white rounded-[8px] border border-slate-100 shadow-sm animate__animated animate__fadeInUp">
+        <div *ngFor="let v of filteredVisitors" (click)="visitorClicked.emit(v)"
+            class="flex items-center justify-between px-4 py-2 bg-white rounded-[8px] border border-slate-100 shadow-sm animate__animated animate__fadeInUp cursor-pointer active:scale-[0.98] transition-transform">
             <div class="flex items-center gap-4">
-                <div class="h-10 w-10 rounded-xl bg-primary-20 flex items-center justify-center">
-                    <ion-icon name="person" class="text-primary text-xl"></ion-icon>
+                <div class="h-10 w-10 rounded-xl bg-primary-20 flex items-center justify-center overflow-hidden">
+                    <app-common-qr *ngIf="v.qrToken" [value]="v.qrToken" [size]="40"
+                        (qrClick)="qrClicked.emit($event)"></app-common-qr>
+                    <ng-container *ngIf="!v.qrToken">
+                        <img *ngIf="v.photoURL" [src]="v.photoURL" class="h-full w-full object-cover" />
+                        <ion-icon *ngIf="!v.photoURL" name="person" class="text-primary text-xl"></ion-icon>
+                    </ng-container>
                 </div>
                 <div class="min-w-0">
                     <h3 class="m-0 text-[15px] font-black text-slate-800 truncate">{{ v.visitorName }}</h3>
-                    <p class="m-0 mt-0.5 text-[12px] font-bold text-slate-400">FLAT {{ v.flatNumber }} • {{
-                        getVisitorDate(v) | date:'shortTime' }}</p>
+                    <p
+                        class="m-0 mt-0.5 text-[12px] font-bold text-slate-400 flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <span>FLAT {{ v.flatNumber }}</span>
+                        <span class="w-1 h-1 rounded-full bg-slate-200"></span>
+                        <a [href]="'tel:' + v.mobile" class="text-indigo-600 no-underline">{{ v.mobile }}</a>
+                        <span *ngIf="v.vehicleNumber"
+                            class="w-full flex items-center gap-1 text-[11px] text-slate-500 font-black uppercase">
+                            <ion-icon name="car-sport-outline" class="text-[14px]"></ion-icon>
+                            {{ v.vehicleNumber }}
+                        </span>
+                    </p>
                 </div>
             </div>
             <div class="flex shrink-0">

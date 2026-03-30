@@ -1,10 +1,10 @@
 import { AsyncPipe, NgIf } from '@angular/common';
 import { Component, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
 import { MenuController, Platform } from '@ionic/angular';
 import { IonApp, IonAvatar, IonButton, IonContent, IonIcon, IonItem, IonLabel, IonList, IonMenu, IonMenuToggle, IonRouterOutlet } from '@ionic/angular/standalone';
-import { distinctUntilChanged, map } from 'rxjs';
+import { distinctUntilChanged, map, filter } from 'rxjs';
 import { AuthService } from './services/auth.service';
 import { PushNotificationsService } from './services/push-notifications.service';
 import { StatusBar } from '@capacitor/status-bar';
@@ -81,7 +81,6 @@ export class AppComponent {
 
     this.authService.currentUser$
       .pipe(
-        distinctUntilChanged((a, b) => (a?.id ?? null) === (b?.id ?? null)),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe((user) => {
@@ -92,6 +91,15 @@ export class AppComponent {
           this.setTheme(''); // Clearing theme layouts if logged out
         }
       });
+
+    // Reset scroll to top on every navigation
+    this.router.events.pipe(
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(() => {
+      const contents = document.querySelectorAll('ion-content');
+      contents.forEach(c => (c as any).scrollToTop?.(0));
+    });
   }
 
   goDashboard() {

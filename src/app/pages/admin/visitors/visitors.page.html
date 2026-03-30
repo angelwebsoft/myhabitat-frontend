@@ -1,0 +1,99 @@
+<app-header title="Visitor Logs" color="primary" [showBack]="true" defaultHref="/admin"></app-header>
+
+<ion-content [style.--background]="'var(--ion-color-primary-light)'">
+    <div class="sticky top-0 z-20 bg-white shadow-sm mb-4">
+        <visit-calendar [visitors]="(visitors$ | async) ?? []" title="Global Monitor"
+            subtitle="View all society entry traffic" [showList]="false" [selectedDate]="selectedDate"
+            (selectedDateChange)="onDateChange($event)" (tabChange)="onTabChange($event)"></visit-calendar>
+
+        <div class="px-5 pb-3">
+            <app-common-input [(ngModel)]="searchTerm" (ngModelChange)="onSearchInternal($event)"
+                placeholder="Search visitor name or flat..." iconName="search" customClass="bg-primary-20">
+            </app-common-input>
+        </div>
+    </div>
+
+    <div class="px-5">
+        <div *ngIf="(filteredVisitors$ | async)?.length" class="space-y-4 pb-20">
+            <div *ngFor="let visitor of filteredVisitors$ | async" class="animate__animated animate__fadeInUp"
+                (click)="viewVisitorDetails(visitor)">
+                <app-common-card customClass="m-0 border-0 shadow-md">
+                    <div slot="header-end"
+                        class="rounded-full px-3 py-1 text-[11px] font-bold flex items-center gap-1.5" [ngClass]="{
+                  'bg-yellow-100 text-yellow-600': visitor.status === 'pending',
+                  'bg-green-100 text-green-600': visitor.status === 'approved',
+                  'bg-blue-100 text-blue-600': visitor.status === 'checked-in',
+                  'bg-red-100 text-red-600': visitor.status === 'rejected',
+                  'bg-gray-100 text-gray-600': visitor.status === 'checked-out'
+                }">
+                        {{ visitor.status.toUpperCase() }}
+                    </div>
+
+                    <div class="flex items-center gap-4 mb-4">
+                        <app-common-qr *ngIf="visitor.qrToken" [value]="visitor.qrToken" [size]="52"
+                            (qrClick)="showFullQr($event)"></app-common-qr>
+                        <ion-avatar *ngIf="!visitor.qrToken"
+                            class="h-[52px] w-[52px] shrink-0 bg-slate-100 rounded-[16px]">
+                            <img class="h-full rounded-[16px]"
+                                [src]="visitor.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg'" />
+                        </ion-avatar>
+                        <div class="min-w-0">
+                            <h2 class="m-0 truncate text-[18px] font-black text-slate-800 leading-tight">{{
+                                visitor.visitorName }}</h2>
+                            <p class="mt-1 text-[13px] font-bold text-slate-400">FLAT {{ visitor.flatNumber }} • {{
+                                (visitor.checkInTime || visitor.createdAt) | date:'shortTime' }}</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="flex items-center gap-2 text-[13px] text-slate-500 font-bold">
+                            <ion-icon name="call-outline" class="text-slate-400 text-lg"></ion-icon>
+                            <a [href]="'tel:' + visitor.mobile" class="text-indigo-600 no-underline">{{ visitor.mobile
+                                }}</a>
+                        </div>
+                        <div class="flex items-center gap-2 text-[13px] text-slate-500 font-bold justify-end">
+                            <ion-icon name="information-circle-outline" class="text-slate-400 text-lg"></ion-icon>
+                            <span class="truncate">{{ visitor.purpose }}</span>
+                        </div>
+                    </div>
+                </app-common-card>
+            </div>
+
+            <ion-modal [isOpen]="isDetailsModalOpen" (didDismiss)="isDetailsModalOpen = false" [breakpoints]="[0, 0.85]"
+                [initialBreakpoint]="0.85" class="custom-sheet-modal">
+                <ng-template>
+                    <app-common-visitor-details [visitor]="selectedVisitor" (qrClick)="showFullQr($event)"
+                        (close)="isDetailsModalOpen = false"></app-common-visitor-details>
+                </ng-template>
+            </ion-modal>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="(filteredVisitors$ | async)?.length === 0"
+            class="flex flex-col items-center justify-center py-20 text-center text-slate-400">
+            <ion-icon name="document-text-outline" class="mb-4 text-7xl opacity-20"></ion-icon>
+            <h3 class="text-[18px] font-black text-slate-300">No Records Found</h3>
+            <p class="text-[14px] font-bold text-slate-300/60 max-w-[200px] mx-auto">No visits recorded for this
+                criteria or date.</p>
+        </div>
+    </div>
+    <ion-modal [isOpen]="isQrModalOpen" (didDismiss)="isQrModalOpen = false" class="qr-fullview-modal">
+        <ng-template>
+            <div class="flex flex-col items-center justify-center h-full p-8 bg-slate-900/40 backdrop-blur-xl"
+                (click)="isQrModalOpen = false">
+                <div class="bg-white p-8 rounded-[48px] shadow-2xl animate__animated animate__zoomIn"
+                    (click)="$event.stopPropagation()">
+                    <app-common-qr [value]="qrTokenForLargeView" [size]="280"></app-common-qr>
+                    <p class="mt-8 mb-2 text-center text-slate-400 font-bold tracking-widest uppercase text-[11px]">
+                        ACCESS PASS</p>
+                    <div class="text-center font-black text-slate-800 text-lg uppercase tracking-tight">{{
+                        qrTokenForLargeView }}</div>
+                </div>
+                <button (click)="isQrModalOpen = false"
+                    class="mt-12 h-14 w-14 rounded-full bg-white/20 text-white flex items-center justify-center border-0 cursor-pointer active:scale-90 transition-transform">
+                    <ion-icon name="close" class="text-3xl"></ion-icon>
+                </button>
+            </div>
+        </ng-template>
+    </ion-modal>
+</ion-content>
