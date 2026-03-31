@@ -3,8 +3,8 @@ import { Component, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, NavigationEnd } from '@angular/router';
 import { MenuController, Platform } from '@ionic/angular';
-import { IonApp, IonAvatar, IonButton, IonContent, IonIcon, IonItem, IonLabel, IonList, IonMenu, IonMenuToggle, IonRouterOutlet } from '@ionic/angular/standalone';
-import { distinctUntilChanged, map, filter } from 'rxjs';
+import { IonApp, IonAvatar, IonButton, IonContent, IonIcon, IonItem, IonLabel, IonList, IonMenu, IonMenuToggle, IonRouterOutlet, IonSpinner } from '@ionic/angular/standalone';
+import { distinctUntilChanged, map, filter, combineLatest, BehaviorSubject } from 'rxjs';
 import { AuthService } from './services/auth.service';
 import { PushNotificationsService } from './services/push-notifications.service';
 import { StatusBar } from '@capacitor/status-bar';
@@ -26,12 +26,13 @@ type UserRole = 'admin' | 'resident' | 'gatekeeper';
     IonList,
     IonMenu,
     IonMenuToggle,
-    IonRouterOutlet
+    IonRouterOutlet,
+    IonSpinner
   ],
 })
 
 export class AppComponent {
-  private authService = inject(AuthService);
+  public authService = inject(AuthService);
   private menuCtrl = inject(MenuController);
   private platform = inject(Platform);
   private push = inject(PushNotificationsService);
@@ -40,9 +41,23 @@ export class AppComponent {
 
   currentUser$ = this.authService.currentUser$.asObservable();
   isNative = this.platform.is('hybrid') || this.platform.is('capacitor') || this.platform.is('cordova');
+
+  showSplash = true;
+
   ngOnInit() {
-    // Left empty or can load other static init things if needed
     StatusBar.setOverlaysWebView({ overlay: false });
+
+    const minTimePassed$ = new BehaviorSubject<boolean>(false);
+    setTimeout(() => minTimePassed$.next(true), 3500); // 3.5 seconds minimum delay
+
+    combineLatest([
+      this.authService.loading$,
+      minTimePassed$
+    ]).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(([loading, minTimePassed]) => {
+      this.showSplash = loading || !minTimePassed;
+    });
   }
 
 

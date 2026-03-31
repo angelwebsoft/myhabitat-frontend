@@ -1,4 +1,10 @@
 <ion-app>
+  <!-- SPLASH SCREEN -->
+  <div *ngIf="showSplash" class="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-white">
+    <div class="relative flex h-48 w-48 items-center justify-center">
+      <img src="assets/animation.svg" class="h-full w-full object-contain" alt="Loading MyHabitat..." />
+    </div>
+  </div>
 
   <!-- SIDE MENU -->
   <ion-menu menuId="main-menu" contentId="main-content" type="overlay">
