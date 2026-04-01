@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import { PreApprovedGuest, User, Visitor } from '../models/visitor.model';
+import { PreApprovedGuest, User, Visitor, MaintenanceBill, Payment } from '../models/visitor.model';
 import { Observable, timeout } from 'rxjs';
 
 @Injectable({
@@ -85,8 +85,41 @@ export class ApiService {
         return this.http.patch<Visitor>(`${this.baseUrl}/visitors/${visitorId}`, updates);
     }
 
+    // --- Maintenance Endpoints ---
+
+    createBill(bill: {
+        flat_number: string;
+        resident_id: string;
+        amount: number;
+        month: string;
+        year: number;
+        due_date: string;
+        society_id: string;
+    }): Observable<{ message: string }> {
+        return this.http.post<{ message: string }>(`${this.baseUrl}/maintenance/create`, bill);
+    }
+
+    getAllBills(societyId: string): Observable<MaintenanceBill[]> {
+        return this.http.get<MaintenanceBill[]>(`${this.baseUrl}/maintenance/all`, { params: { societyId } });
+    }
+
+    getMyBills(residentId: string): Observable<MaintenanceBill[]> {
+        return this.http.get<MaintenanceBill[]>(`${this.baseUrl}/maintenance/my`, { params: { resident_id: residentId } });
+    }
+
+    payBill(payload: {
+        bill_id: string;
+        amount: number;
+        payment_mode: string;
+        transaction_id?: string;
+    }): Observable<{ message: string }> {
+        return this.http.post<{ message: string }>(`${this.baseUrl}/maintenance/pay`, payload);
+    }
+
+
     // --- Test Connection ---
     testConnection(): Observable<any> {
         return this.http.get(`${this.baseUrl}/test`);
     }
 }
+

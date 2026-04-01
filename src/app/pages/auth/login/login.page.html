@@ -49,7 +49,7 @@
             <div class="mt-4">
                 <div
                     class="mx-0 rounded-[32px] border border-slate-100 bg-white p-4 shadow-[0_-8px_30px_rgba(0,0,0,0.02),0_20px_40px_rgba(0,0,0,0.06)]">
-                    <div class="pb-3">
+                    <div class="">
                         <div class="mb-4 inline-flex items-center rounded-full bg-indigo-50 px-3 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-indigo-500"
                             *ngIf="!otpSent">
                             Secure Login
@@ -102,7 +102,7 @@
                             {{ isVerifyingOtp ? 'Verifying OTP...' : 'Verify OTP' }}
                         </ion-button>
 
-                        <div id="recaptcha-container" class="mt-4"></div>
+                        <div id="recaptcha-container" class="hidden"></div>
                     </div>
                 </div>
 

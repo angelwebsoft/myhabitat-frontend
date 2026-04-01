@@ -1,0 +1,78 @@
+<ion-header class="ion-no-border">
+    <app-header title="Generate Bill" [showBack]="true" color="primary"></app-header>
+</ion-header>
+
+<ion-content [style.--background]="'var(--ion-color-primary-light)'">
+    <div class="px-6 pt-8 pb-10">
+        <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 animate__animated animate__fadeInUp">
+            <h2 class="mt-0 mb-8 text-[22px] font-black text-slate-800 tracking-tight leading-tight">Generate
+                Maintenance Bill</h2>
+
+            <div class="space-y-6">
+                <!-- Resident Selection -->
+                <div>
+                    <label
+                        class="block text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2">Resident</label>
+                    <div class="relative group">
+                        <select [(ngModel)]="selectedResidentId"
+                            class="w-full h-[54px] pl-4 pr-10 bg-slate-50 border-2 border-slate-50 rounded-2xl text-[15px] font-bold text-slate-700 appearance-none focus:bg-white focus:border-indigo-500/20 focus:ring-4 focus:ring-indigo-500/5 transition-all outline-none">
+                            <option value="" disabled>Select Resident</option>
+                            <option *ngFor="let res of residents" [value]="res.uniqueId">
+                                {{ res.userName }} - {{ res.flatNumber }}
+                            </option>
+                        </select>
+                        <ion-icon name="chevron-down-outline"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-lg"></ion-icon>
+                    </div>
+                </div>
+
+                <!-- Amount -->
+                <div>
+                    <label
+                        class="block text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2">Amount
+                        (₹)</label>
+                    <input type="number" [(ngModel)]="amount" placeholder="e.g. 1500"
+                        class="w-full h-[54px] px-4 bg-slate-50 border-2 border-slate-50 rounded-2xl text-[15px] font-bold text-slate-700 focus:bg-white focus:border-indigo-500/20 focus:ring-4 focus:ring-indigo-500/5 transition-all outline-none" />
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- Month -->
+                    <div>
+                        <label
+                            class="block text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2">Month</label>
+                        <div class="relative">
+                            <select [(ngModel)]="month"
+                                class="w-full h-[54px] pl-4 pr-10 bg-slate-50 border-2 border-slate-50 rounded-2xl text-[15px] font-bold text-slate-700 appearance-none focus:bg-white focus:border-indigo-500/20 focus:ring-4 focus:ring-indigo-500/5 transition-all outline-none">
+                                <option *ngFor="let m of months" [value]="m">{{ m }}</option>
+                            </select>
+                            <ion-icon name="calendar-outline"
+                                class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-lg"></ion-icon>
+                        </div>
+                    </div>
+
+                    <!-- Year -->
+                    <div>
+                        <label
+                            class="block text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2">Year</label>
+                        <input type="number" [(ngModel)]="year"
+                            class="w-full h-[54px] px-4 bg-slate-50 border-2 border-slate-50 rounded-2xl text-[15px] font-bold text-slate-700 focus:bg-white focus:border-indigo-500/20 focus:ring-4 focus:ring-indigo-500/5 transition-all outline-none" />
+                    </div>
+                </div>
+
+                <!-- Due Date -->
+                <div>
+                    <label class="block text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2">Due
+                        Date</label>
+                    <div class="relative">
+                        <input type="date" [(ngModel)]="dueDate"
+                            class="w-full h-[54px] px-4 bg-slate-50 border-2 border-slate-50 rounded-2xl text-[15px] font-bold text-slate-700 focus:bg-white focus:border-indigo-500/20 focus:ring-4 focus:ring-indigo-500/5 transition-all outline-none" />
+                    </div>
+                </div>
+
+                <div class="pt-4">
+                    <app-common-button label="Generate Bill" (click)="onSubmit()" color="primary"></app-common-button>
+                </div>
+            </div>
+        </div>
+    </div>
+</ion-content>

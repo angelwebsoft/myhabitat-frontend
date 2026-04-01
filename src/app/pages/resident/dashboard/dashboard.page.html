@@ -8,16 +8,37 @@
         welcomeSubtitle="Manage your home access and visitors" searchPlaceholder="Search through visitor logs..."
         (action)="onPreApprove()"></app-dashboard-header>
 
+    <!-- Quick Actions -->
+    <div class="px-5 pt-8 grid grid-cols-2 gap-4">
+        <div (click)="onPreApprove()"
+            class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm active:scale-95 transition-all text-center">
+            <div class="h-12 w-12 rounded-2xl bg-tertiary-light flex items-center justify-center mb-3 mx-auto">
+                <ion-icon name="qr-code" class="text-2xl text-tertiary"></ion-icon>
+            </div>
+            <h3 class="text-[15px] font-black text-slate-800 m-0">Pre-Approve</h3>
+            <p class="text-[10px] font-bold text-slate-400 m-0">Guest Entry</p>
+        </div>
+
+        <div (click)="onMaintenance()"
+            class="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm active:scale-95 transition-all text-center">
+            <div class="h-12 w-12 rounded-2xl bg-amber-50 flex items-center justify-center mb-3 mx-auto">
+                <ion-icon name="receipt" class="text-2xl text-amber-500"></ion-icon>
+            </div>
+            <h3 class="text-[15px] font-black text-slate-800 m-0">Maintenance</h3>
+            <p class="text-[10px] font-bold text-slate-400 m-0">Pay & View</p>
+        </div>
+    </div>
+
     <!-- Main List/Calendar area -->
-    <h2 class="px-5 mt-6 mb-2 text-[18px] font-black text-slate-900 tracking-tight">Recent Visitors</h2>
+    <h2 class="px-5 mt-10 mb-2 text-[18px] font-black text-slate-900 tracking-tight">Recent Visitors</h2>
 
     <visit-calendar [visitors]="(visitors$ | async) ?? []" emptyText="No visitors found for your flat yet."
         [showList]="true" (visitorClicked)="viewVisitorDetails($event)" (qrClicked)="showFullQr($event)"
-        class="block pb-32"></visit-calendar>
+        class="block"></visit-calendar>
 
     <!-- Native Fixed Floating Action Button (Matches Gatekeeper/Admin style) -->
     <button (click)="onPreApprove()" [style.bottom]="'calc(env(safe-area-inset-bottom, 0px) + 24px)'"
-        class="fixed right-5 z-[99] flex h-[56px] w-[56px] items-center justify-center rounded-full bg-slate-900 shadow-[0_6px_16px_rgba(15,23,42,0.4)] transition-transform active:scale-95 sm:bottom-8 sm:right-8 border-0"
+        class="fixed right-5 z-[99] flex h-[56px] w-[56px] items-center justify-center rounded-full bg-[var(--ion-color-tertiary)] shadow-[0_6px_16px_rgba(var(--ion-color-tertiary-rgb),0.4)] transition-transform active:scale-95 sm:bottom-8 sm:right-8 border-0"
         style="--border-radius: 50%;">
         <ion-icon name="add" class="text-[32px] text-white"></ion-icon>
     </button>

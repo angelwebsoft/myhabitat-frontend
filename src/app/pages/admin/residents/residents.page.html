@@ -30,27 +30,64 @@
     </button>
     <div *ngIf="filteredUsers.length" class="space-y-4">
       <div *ngFor="let user of filteredUsers" class="animate__animated animate__fadeInUp" (click)="viewDetails(user)">
-        <app-common-card customClass="m-0 border-0 shadow-md rounded-[10px]">
-          <div slot="header-end" class="flex gap-2" (click)="$event.stopPropagation()">
-            <ion-button fill="clear" color="primary" class="m-0" (click)="editUser(user)">
-              <ion-icon name="pencil-outline" slot="icon-only" class="text-[18px]"></ion-icon>
-            </ion-button>
-            <ion-button fill="clear" color="danger" class="m-0" (click)="deleteUser(user.id)">
-              <ion-icon name="trash-outline" slot="icon-only" class="text-[18px]"></ion-icon>
-            </ion-button>
-          </div>
+        <app-common-card customClass="m-0 border-0 shadow-lg rounded-[24px] overflow-hidden p-0 relative bg-white">
+          <div class="p-5">
+            <!-- Top Section: Avatar and Name/Badge -->
+            <div class="flex items-start gap-4">
+              <div class="relative">
+                <ion-avatar
+                  class="h-[64px] w-[64px] shrink-0 bg-slate-50 rounded-[20px] border-2 border-slate-50 shadow-sm">
+                  <img class="h-full rounded-[20px] object-cover"
+                    [src]="user.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg'" />
+                </ion-avatar>
+                <!-- Resident Type Badge Overlay -->
+                <div *ngIf="user.role === 'resident'"
+                  class="absolute -bottom-1 -right-1 h-7 w-7 rounded-full bg-white shadow-md flex items-center justify-center text-[14px] border border-slate-100">
+                  {{ user.residentType === 'tenant' ? '🏠' : '👑' }}
+                </div>
+              </div>
 
-          <div class="flex items-center gap-4">
-            <ion-avatar class="h-[52px] w-[52px] shrink-0 bg-slate-100 rounded-[16px]">
-              <img class="h-full rounded-[16px]"
-                [src]="user.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg'" />
-            </ion-avatar>
-            <div class="min-w-0">
-              <h2 class="m-0 truncate text-[17px] font-black text-slate-800 tracking-tight leading-tight">{{
-                user.userName }}</h2>
-              <p class="mt-0.5 text-[12px] font-bold text-slate-400 uppercase tracking-widest">
-                {{ user.flatNumber ? 'Flat ' + user.flatNumber : user.role }} • {{ user.mobileNumber }}
-              </p>
+              <div class="min-w-0 flex-1 pt-1">
+                <div class="flex items-center justify-between gap-2">
+                  <h2 class="m-0 truncate text-[18px] font-black text-slate-800 tracking-tight leading-none uppercase">
+                    {{ user.userName }}
+                  </h2>
+                </div>
+
+                <p class="mt-2 text-[11px] font-black text-primary uppercase tracking-[0.1em] opacity-80">
+                  {{ user.role }} • {{ user.residentType || 'owner' }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Details Section: Flat and Mobile -->
+            <div class="mt-4 grid grid-cols-2 gap-3">
+              <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100/50">
+                <p class="m-0 text-[9px] font-black text-slate-400 tracking-widest uppercase">Flat / Location</p>
+                <p class="m-0 text-[13px] font-bold text-slate-700 truncate">
+                  {{ user.flatNumber || 'NOT ASSIGNED' }}
+                </p>
+              </div>
+              <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100/50">
+                <p class="m-0 text-[9px] font-black text-slate-400 tracking-widest uppercase">Mobile Number</p>
+                <p class="m-0 text-[13px] font-bold text-slate-700 truncate">
+                  {{ user.mobileNumber }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Action buttons row -->
+            <div class="flex items-center gap-3 mt-5 pt-1" (click)="$event.stopPropagation()">
+              <button (click)="editUser(user)"
+                class="flex-1 flex items-center justify-center gap-2 h-11 rounded-xl text-primary bg-primary-10 border-0 active:scale-95 transition-all outline-none font-black text-[12px] uppercase tracking-widest">
+                <ion-icon name="pencil" class="text-lg"></ion-icon>
+                Edit
+              </button>
+              <button (click)="deleteUser(user.id)"
+                class="flex-1 flex items-center justify-center gap-2 h-11 rounded-xl text-rose-500 bg-rose-50 border-0 active:scale-95 transition-all outline-none font-black text-[12px] uppercase tracking-widest">
+                <ion-icon name="trash" class="text-lg"></ion-icon>
+                Delete
+              </button>
             </div>
           </div>
         </app-common-card>
@@ -90,6 +127,19 @@
           <app-common-input [(ngModel)]="newUser.vehicleNumber" label="Vehicle Number"
             placeholder="Enter vehicle number" iconName="car-sport">
           </app-common-input>
+
+          <div *ngIf="viewRole === 'resident'" class="flex flex-col gap-2">
+            <label class="text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">Resident Type</label>
+            <div class="relative group">
+              <select [(ngModel)]="newUser.residentType"
+                class="w-full h-[54px] pl-4 pr-10 bg-slate-50 border-2 border-slate-50 rounded-2xl text-[15px] font-bold text-slate-700 appearance-none focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 transition-all outline-none">
+                <option value="owner">👑 Owner</option>
+                <option value="tenant">🏠 Tenant</option>
+              </select>
+              <ion-icon name="chevron-down-outline"
+                class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-lg"></ion-icon>
+            </div>
+          </div>
 
           <div class="flex flex-col gap-2">
             <label class="text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">Profile Photo</label>
@@ -134,6 +184,19 @@
           <app-common-input [(ngModel)]="editingUser.vehicleNumber" label="Vehicle Number" placeholder="Enter vehicle"
             iconName="car-sport">
           </app-common-input>
+
+          <div *ngIf="editingUser.role === 'resident'" class="flex flex-col gap-2">
+            <label class="text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">Resident Type</label>
+            <div class="relative group">
+              <select [(ngModel)]="editingUser.residentType"
+                class="w-full h-[54px] pl-4 pr-10 bg-slate-50 border-2 border-slate-50 rounded-2xl text-[15px] font-bold text-slate-700 appearance-none focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 transition-all outline-none">
+                <option value="owner">👑 Owner</option>
+                <option value="tenant">🏠 Tenant</option>
+              </select>
+              <ion-icon name="chevron-down-outline"
+                class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-lg"></ion-icon>
+            </div>
+          </div>
 
           <div class="flex flex-col gap-2">
             <label class="text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">Profile Photo</label>
@@ -205,9 +268,19 @@
                 <div class="h-9 w-9 flex items-center justify-center rounded-xl bg-emerald-50 text-emerald-500">
                   <ion-icon name="home" class="text-lg"></ion-icon>
                 </div>
-                <div class="flex-1 min-w-0">
-                  <p class="m-0 text-[10px] font-black text-slate-400 uppercase tracking-widest">Flat Number</p>
-                  <p class="m-0 text-[15px] font-bold text-slate-700 uppercase">FLAT {{ selectedUser.flatNumber }}</p>
+                <div class="flex-1 min-w-0 flex items-center justify-between pr-2">
+                  <div>
+                    <p class="m-0 text-[10px] font-black text-slate-400 uppercase tracking-widest">Flat Number</p>
+                    <p class="m-0 text-[15px] font-bold text-slate-700 uppercase">FLAT {{ selectedUser.flatNumber }}</p>
+                  </div>
+                  <div class="text-right">
+                    <p class="m-0 text-[10px] font-black text-slate-400 uppercase tracking-widest">Type</p>
+                    <div class="flex items-center gap-1.5 justify-end">
+                      <span class="text-lg">{{ selectedUser.residentType === 'tenant' ? '🏠' : '👑' }}</span>
+                      <p class="m-0 text-[13px] font-black text-slate-700 uppercase">{{ selectedUser.residentType ||
+                        'owner' }}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
 

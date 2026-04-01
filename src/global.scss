@@ -178,3 +178,10 @@ ion-item {
 ion-list {
     --background: transparent;
 }
+
+/* Forceful override to completely hide the persistent Google reCAPTCHA badge on mobile WebView safely */
+.grecaptcha-badge {
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}

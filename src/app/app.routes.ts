@@ -44,6 +44,13 @@ export const routes: Routes = [
     data: { role: 'resident' }
   },
   {
+    path: 'resident/maintenance',
+    loadComponent: () => import('./pages/resident/maintenance/my-bills/my-bills.page').then(m => m.MyBillsPage),
+    canActivate: [roleGuard],
+    data: { role: 'resident' }
+  },
+
+  {
     path: 'admin',
     loadComponent: () => import('./pages/admin/dashboard/dashboard.page').then(m => m.AdminDashboardPage),
     canActivate: [roleGuard],
@@ -73,6 +80,19 @@ export const routes: Routes = [
     canActivate: [roleGuard],
     data: { role: 'admin' }
   },
+  {
+    path: 'admin/maintenance/bills',
+    loadComponent: () => import('./pages/admin/maintenance/bills-list/bills-list.page').then(m => m.BillsListPage),
+    canActivate: [roleGuard],
+    data: { role: 'admin' }
+  },
+  {
+    path: 'admin/maintenance/create',
+    loadComponent: () => import('./pages/admin/maintenance/create-bill/create-bill.page').then(m => m.CreateBillPage),
+    canActivate: [roleGuard],
+    data: { role: 'admin' }
+  },
+
   // Backward-compatible routes (redirect to new URLs)
   {
     path: 'admin/residents',

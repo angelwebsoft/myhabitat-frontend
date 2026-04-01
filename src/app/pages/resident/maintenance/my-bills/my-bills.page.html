@@ -1,0 +1,68 @@
+<ion-header class="ion-no-border">
+    <app-header title="My Maintenance" [showBack]="true" color="tertiary"></app-header>
+</ion-header>
+
+<ion-content [style.--background]="'var(--ion-color-primary-light)'">
+    <div class="px-5 pt-8 pb-20">
+        <h2 class="mt-0 mb-6 text-[22px] font-black text-slate-800 tracking-tight leading-tight">My Bills</h2>
+
+        <!-- Loading State -->
+        <div *ngIf="isLoading" class="space-y-4">
+            <div *ngFor="let i of [1,2,3]"
+                class="h-40 w-full bg-white rounded-3xl animate-pulse border border-slate-100"></div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!isLoading && bills.length === 0"
+            class="flex flex-col items-center justify-center py-20 text-center animate__animated animate__fadeIn">
+            <div class="h-24 w-24 rounded-[40px] bg-slate-100 flex items-center justify-center mb-6">
+                <ion-icon name="receipt" class="text-5xl text-slate-400"></ion-icon>
+            </div>
+            <h3 class="text-xl font-black text-slate-800 m-0">All Settled!</h3>
+            <p class="text-sm font-bold text-slate-400 mt-2 px-10 leading-relaxed">No maintenance bills found for your
+                flat. You're all caught up!</p>
+        </div>
+
+        <!-- Bills List -->
+        <div *ngIf="!isLoading && bills.length > 0" class="space-y-6">
+            <div *ngFor="let bill of bills"
+                class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm animate__animated animate__fadeInUp">
+                <div class="flex justify-between items-start mb-6">
+                    <div class="flex items-center gap-4">
+                        <div class="h-10 w-10 rounded-xl bg-slate-50 flex items-center justify-center">
+                            <ion-icon name="calendar" class="text-xl text-slate-400"></ion-icon>
+                        </div>
+                        <div>
+                            <p
+                                class="text-[10px] font-black text-slate-400 uppercase tracking-widest m-0 leading-tight">
+                                Bill Period</p>
+                            <h3 class="text-[17px] font-black text-slate-800 m-0">{{ bill.month }} {{ bill.year }}</h3>
+                        </div>
+                    </div>
+                    <div class="text-[24px] font-black text-slate-900 leading-none">₹{{ bill.amount }}</div>
+                </div>
+
+                <div class="flex items-center justify-between border-t border-slate-50 pt-6">
+                    <div class="flex flex-col">
+                        <span
+                            class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 leading-tight">Status</span>
+                        <span class="inline-flex py-1 text-xs font-black uppercase tracking-widest"
+                            [ngClass]="bill.status === 'paid' ? 'text-emerald-500' : 'text-rose-500'">
+                            {{ bill.status }}
+                        </span>
+                    </div>
+
+                    <button *ngIf="bill.status === 'unpaid'" (click)="markAsPaid(bill)"
+                        class="h-10 px-6 rounded-xl bg-[var(--ion-color-tertiary)] text-white font-black text-[13px] border-0 active:scale-95 transition-all outline-none">
+                        Pay Now
+                    </button>
+
+                    <div *ngIf="bill.status === 'paid'" class="flex items-center gap-2 text-emerald-500">
+                        <ion-icon name="checkmark-circle" class="text-xl"></ion-icon>
+                        <span class="text-[13px] font-black uppercase tracking-tight">PAID</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ion-content>

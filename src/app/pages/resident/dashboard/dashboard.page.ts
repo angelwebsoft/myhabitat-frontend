@@ -63,4 +63,9 @@ export class ResidentDashboardPage implements OnInit {
   onPreApprove() {
     this.router.navigate(['/resident/pre-approve']);
   }
+
+  onMaintenance() {
+    this.router.navigate(['/resident/maintenance']);
+  }
 }
+

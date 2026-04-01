@@ -1,0 +1,58 @@
+<ion-header class="ion-no-border">
+    <app-header title="Society Bills" [showBack]="true" color="primary"></app-header>
+</ion-header>
+
+<ion-content [style.--background]="'var(--ion-color-primary-light)'">
+    <div class="px-5 pt-6 pb-20">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="m-0 text-[18px] font-black text-slate-900 tracking-tight leading-tight">Maintenance Bills</h2>
+            <button (click)="goToCreate()"
+                class="flex h-10 px-4 items-center justify-center rounded-[10px] bg-indigo-500 text-white font-black text-[13px] border-0 active:scale-95 transition-all outline-none">
+                New Bill
+            </button>
+        </div>
+
+        <!-- Loading State -->
+        <div *ngIf="isLoading" class="space-y-4">
+            <div *ngFor="let i of [1,2,3,4,5]"
+                class="h-24 w-full bg-white rounded-2xl animate-pulse border border-slate-100"></div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!isLoading && bills.length === 0"
+            class="flex flex-col items-center justify-center py-20 text-center animate__animated animate__fadeIn">
+            <div class="h-20 w-20 rounded-3xl bg-indigo-50 flex items-center justify-center mb-4">
+                <ion-icon name="receipt-outline" class="text-4xl text-indigo-500"></ion-icon>
+            </div>
+            <h3 class="text-lg font-black text-slate-800 m-0">No Bills Yet</h3>
+            <p class="text-xs font-bold text-slate-400 mt-2 px-10">Generate maintenance bills for residents to track
+                payments and dues.</p>
+        </div>
+
+        <!-- Bills List -->
+        <div *ngIf="!isLoading && bills.length > 0" class="space-y-4">
+            <div *ngFor="let bill of bills"
+                class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between animate__animated animate__fadeInUp">
+                <div class="flex items-center gap-4">
+                    <div class="h-12 w-12 rounded-xl flex items-center justify-center"
+                        [ngClass]="bill.status === 'paid' ? 'bg-emerald-50' : 'bg-rose-50'">
+                        <ion-icon [name]="bill.status === 'paid' ? 'checkmark-circle' : 'time'" class="text-2xl"
+                            [ngClass]="bill.status === 'paid' ? 'text-emerald-500' : 'text-rose-500'"></ion-icon>
+                    </div>
+                    <div>
+                        <h3 class="text-[17px] font-black text-slate-800 m-0">Flat {{ bill.flatNumber }}</h3>
+                        <p class="text-[11px] font-bold text-slate-400 m-0 uppercase tracking-wider">{{ bill.month }} {{
+                            bill.year }}</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <div class="text-[18px] font-black text-slate-900 leading-none">₹{{ bill.amount }}</div>
+                    <div class="mt-2 inline-flex px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border"
+                        [ngClass]="bill.status === 'paid' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100'">
+                        {{ bill.status }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ion-content>

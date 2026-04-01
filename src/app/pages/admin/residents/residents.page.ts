@@ -37,22 +37,24 @@ export class AdminResidentsPage implements OnInit {
   isEditModalOpen = false;
   isEditing = false;
 
-  newUser: { userName: string; mobileNumber: string; flatNumber: string; vehicleNumber: string; photoURL: string } = {
+  newUser: { userName: string; mobileNumber: string; flatNumber: string; vehicleNumber: string; photoURL: string; residentType: 'owner' | 'tenant' } = {
     userName: '',
     mobileNumber: '',
     flatNumber: '',
     vehicleNumber: '',
-    photoURL: ''
+    photoURL: '',
+    residentType: 'owner'
   };
 
-  editingUser: { id: string; userName: string; mobileNumber: string; flatNumber: string; vehicleNumber: string; role: User['role']; photoURL: string } = {
+  editingUser: { id: string; userName: string; mobileNumber: string; flatNumber: string; vehicleNumber: string; role: User['role']; photoURL: string; residentType: 'owner' | 'tenant' } = {
     id: '',
     userName: '',
     mobileNumber: '',
     flatNumber: '',
     vehicleNumber: '',
     role: 'resident',
-    photoURL: ''
+    photoURL: '',
+    residentType: 'owner'
   };
 
   private dataService = inject(DataService);
@@ -94,7 +96,7 @@ export class AdminResidentsPage implements OnInit {
   }
 
   addUser() {
-    this.newUser = { userName: '', mobileNumber: '', flatNumber: '', vehicleNumber: '', photoURL: '' };
+    this.newUser = { userName: '', mobileNumber: '', flatNumber: '', vehicleNumber: '', photoURL: '', residentType: 'owner' };
     this.isEditing = false;
     this.isAddModalOpen = true;
   }
@@ -107,7 +109,8 @@ export class AdminResidentsPage implements OnInit {
       flatNumber: user.flatNumber || '',
       vehicleNumber: user.vehicleNumber || '',
       role: user.role,
-      photoURL: user.photoURL || ''
+      photoURL: user.photoURL || '',
+      residentType: user.residentType || 'owner'
     };
     this.isEditing = true;
     this.isEditModalOpen = true;
@@ -127,6 +130,7 @@ export class AdminResidentsPage implements OnInit {
         mobileNumber: this.newUser.mobileNumber.trim(),
         role: this.viewRole,
         flatNumber: this.viewRole === 'resident' ? this.newUser.flatNumber.trim().toUpperCase() : undefined,
+        residentType: this.viewRole === 'resident' ? this.newUser.residentType : undefined,
         vehicleNumber: this.newUser.vehicleNumber.trim() || undefined,
         photoURL: this.newUser.photoURL || undefined,
         societyId: user.societyId
@@ -155,6 +159,7 @@ export class AdminResidentsPage implements OnInit {
         mobileNumber: this.editingUser.mobileNumber.trim(),
         role: this.editingUser.role,
         flatNumber: this.editingUser.role === 'resident' ? this.editingUser.flatNumber.trim().toUpperCase() : undefined,
+        residentType: this.editingUser.role === 'resident' ? this.editingUser.residentType : undefined,
         vehicleNumber: this.editingUser.vehicleNumber.trim() || undefined,
         photoURL: this.editingUser.photoURL || undefined,
         societyId: currentAdmin.societyId

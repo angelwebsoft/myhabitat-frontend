@@ -16,6 +16,8 @@ export interface User {
   flatNumber?: string;
   vehicleNumber?: string;
   societyId: string;
+  residentType?: 'owner' | 'tenant';
+  ownerId?: string;
   fcmToken?: string;
   createdAt: any;
   name?: string;
@@ -52,3 +54,34 @@ export interface PreApprovedGuest {
   status: 'pending' | 'used';
   createdAt?: any;
 }
+
+export interface MaintenanceBill {
+  id: string;
+  flatNumber: string;
+  flat_number: string;
+  residentId: string;
+  resident_id: string;
+  amount: number;
+  month: string;
+  year: number;
+  dueDate: any;
+  due_date: any;
+  status: 'paid' | 'unpaid';
+  societyId: string;
+  society_id: string;
+  createdAt: any;
+}
+
+export interface Payment {
+  id: string;
+  billId: string;
+  bill_id: string;
+  amount: number;
+  paymentMode: 'cash' | 'online';
+  payment_mode: 'cash' | 'online';
+  transactionId?: string;
+  transaction_id?: string;
+  paidAt: any;
+  paid_at: any;
+}
+
