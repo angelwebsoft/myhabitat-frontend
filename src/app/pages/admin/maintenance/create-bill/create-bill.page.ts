@@ -44,6 +44,16 @@ export class CreateBillPage implements OnInit {
         // Default to current month
         this.month = this.months[new Date().getMonth()];
     }
+    onResidentChange() {
+        const resident = this.residents.find(r => r.uniqueId === this.selectedResidentId);
+        if (resident) {
+            if (resident.residentType === 'tenant') {
+                this.amount = 1500;
+            } else {
+                this.amount = 1000;
+            }
+        }
+    }
 
     async onSubmit() {
         if (!this.selectedResidentId || !this.amount || !this.month || !this.year || !this.dueDate) {

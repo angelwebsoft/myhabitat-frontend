@@ -1,4 +1,4 @@
-import { AsyncPipe, NgIf } from '@angular/common';
+import { AsyncPipe, NgIf, NgClass } from '@angular/common';
 import { Component, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, NavigationEnd } from '@angular/router';
@@ -7,6 +7,7 @@ import { IonApp, IonAvatar, IonButton, IonContent, IonIcon, IonItem, IonLabel, I
 import { distinctUntilChanged, map, filter, combineLatest, BehaviorSubject } from 'rxjs';
 import { AuthService } from './services/auth.service';
 import { PushNotificationsService } from './services/push-notifications.service';
+import { NotificationService } from './services/notification.service';
 import { StatusBar } from '@capacitor/status-bar';
 type UserRole = 'admin' | 'resident' | 'gatekeeper';
 @Component({
@@ -16,6 +17,7 @@ type UserRole = 'admin' | 'resident' | 'gatekeeper';
   imports: [
     AsyncPipe,
     NgIf,
+    NgClass,
     IonApp,
     IonAvatar,
     IonButton,
@@ -37,8 +39,10 @@ export class AppComponent {
   private platform = inject(Platform);
   private push = inject(PushNotificationsService);
   private destroyRef = inject(DestroyRef);
+  private notificationService = inject(NotificationService);
   router = inject(Router);
 
+  toast$ = this.notificationService.toast$;
   currentUser$ = this.authService.currentUser$.asObservable();
   isNative = this.platform.is('hybrid') || this.platform.is('capacitor') || this.platform.is('cordova');
 
@@ -101,7 +105,7 @@ export class AppComponent {
       .subscribe((user) => {
         if (user) {
           this.setTheme(user.role);
-          void this.push.initForWeb(user);
+          void this.push.init(user);
         } else {
           this.setTheme(''); // Clearing theme layouts if logged out
         }

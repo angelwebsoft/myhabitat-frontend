@@ -116,6 +116,23 @@ export class ApiService {
         return this.http.post<{ message: string }>(`${this.baseUrl}/maintenance/pay`, payload);
     }
 
+    generateAllBills(payload: {
+        societyId: string;
+        month: string;
+        year: number;
+        dueDate: string;
+    }): Observable<{ message: string; summary: any }> {
+        return this.http.post<{ message: string; summary: any }>(`${this.baseUrl}/maintenance/generate-all`, payload);
+    }
+
+    updateBill(id: string, updates: Partial<MaintenanceBill>): Observable<MaintenanceBill> {
+        return this.http.patch<MaintenanceBill>(`${this.baseUrl}/maintenance/${id}`, updates);
+    }
+
+    deleteBill(id: string): Observable<{ message: string }> {
+        return this.http.delete<{ message: string }>(`${this.baseUrl}/maintenance/${id}`);
+    }
+
 
     // --- Test Connection ---
     testConnection(): Observable<any> {

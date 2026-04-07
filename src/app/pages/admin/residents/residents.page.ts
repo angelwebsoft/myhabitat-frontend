@@ -10,6 +10,9 @@ import { AppHeaderComponent } from '../../../components/app-header/app-header.co
 import { CommonInputComponent } from '../../../components/common-input/common-input.component';
 import { CommonCardComponent } from '../../../components/common-card/common-card.component';
 import { CommonButtonComponent } from '../../../components/common-button/common-button.component';
+import { ApiService } from '../../../services/api.service';
+import { MaintenanceBill } from '../../../models/visitor.model';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-admin-residents',
@@ -37,6 +40,9 @@ export class AdminResidentsPage implements OnInit {
   isEditModalOpen = false;
   isEditing = false;
 
+  maintenanceBills: MaintenanceBill[] = [];
+  isLoadingMaintenance = false;
+
   newUser: { userName: string; mobileNumber: string; flatNumber: string; vehicleNumber: string; photoURL: string; residentType: 'owner' | 'tenant' } = {
     userName: '',
     mobileNumber: '',
@@ -63,6 +69,7 @@ export class AdminResidentsPage implements OnInit {
   private loadingCtrl = inject(LoadingController);
   private toastCtrl = inject(ToastController);
   private route = inject(ActivatedRoute);
+  private apiService = inject(ApiService);
 
   ngOnInit() {
     const viewRoleFromRoute = this.route.snapshot.data?.['viewRole'] as User['role'] | undefined;
@@ -124,7 +131,7 @@ export class AdminResidentsPage implements OnInit {
     const loading = await this.loadingCtrl.create({ message: 'Registering...' });
     await loading.present();
     try {
-      await this.dataService.createUser({
+      const createdUser = await this.dataService.createUser({
         uniqueId: `${this.viewRole.slice(0, 3)}_${Date.now().toString(36)}`,
         userName: this.newUser.userName.trim(),
         mobileNumber: this.newUser.mobileNumber.trim(),
@@ -135,6 +142,29 @@ export class AdminResidentsPage implements OnInit {
         photoURL: this.newUser.photoURL || undefined,
         societyId: user.societyId
       });
+
+      // Auto-generate maintenance bill for new residents
+      if (this.viewRole === 'resident' && createdUser.uniqueId) {
+        const months = [
+          'January', 'February', 'March', 'April', 'May', 'June',
+          'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+        const now = new Date();
+        const month = months[now.getMonth()];
+        const year = now.getFullYear();
+        const dueDate = new Date(now.setDate(now.getDate() + 15)).toISOString();
+        const amount = this.newUser.residentType === 'tenant' ? 1500 : 1000;
+
+        await firstValueFrom(this.apiService.createBill({
+          flat_number: createdUser.flatNumber || this.newUser.flatNumber.toUpperCase(),
+          resident_id: createdUser.uniqueId,
+          amount,
+          month,
+          year,
+          due_date: dueDate,
+          society_id: user.societyId
+        }));
+      }
       this.isAddModalOpen = false;
       await this.loadUsers();
       const toast = await this.toastCtrl.create({ message: 'User added successfully', duration: 2000, color: 'success' });
@@ -200,9 +230,23 @@ export class AdminResidentsPage implements OnInit {
     await alert.present();
   }
 
-  viewDetails(user: User) {
+  async viewDetails(user: User) {
     this.selectedUser = user;
     this.isDetailsModalOpen = true;
+    this.maintenanceBills = [];
+
+    if (user.role === 'resident') {
+      this.isLoadingMaintenance = true;
+      this.apiService.getMyBills(user.uniqueId).subscribe({
+        next: (bills) => {
+          this.maintenanceBills = bills;
+          this.isLoadingMaintenance = false;
+        },
+        error: () => {
+          this.isLoadingMaintenance = false;
+        }
+      });
+    }
   }
 
   takePhoto(isNew: boolean) {

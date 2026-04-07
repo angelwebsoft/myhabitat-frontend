@@ -20,12 +20,17 @@ export class VisitCalendarComponent implements OnInit, OnChanges {
   @Input() subtitle = 'Select a date to see visits';
   @Input() emptyText = 'No visits found for this date.';
   @Input() showList: boolean = true;
+  @Input() showTabs: boolean = true;
   @Input() selectedDate?: string;
+
+  @Input() showResidentActions: boolean = false;
 
   @Output() selectedDateChange = new EventEmitter<string>();
   @Output() tabChange = new EventEmitter<'upcoming' | 'walk-in' | 'pre-approved'>();
   @Output() visitorClicked = new EventEmitter<Visitor>();
   @Output() qrClicked = new EventEmitter<string>();
+  @Output() approveVisitor = new EventEmitter<Visitor>();
+  @Output() rejectVisitor = new EventEmitter<Visitor>();
 
   highlightedDates: any[] = [];
   selectedDateInternal = '';
@@ -128,7 +133,9 @@ export class VisitCalendarComponent implements OnInit, OnChanges {
     const today = this.toLocalIsoDate(new Date());
     let list = (this.visitors ?? []);
 
-    if (this.selectedTab === 'upcoming') {
+    if (!this.showTabs) {
+      list = list.filter(v => this.toLocalIsoDate(this.getVisitorDate(v)) === selected);
+    } else if (this.selectedTab === 'upcoming') {
       // Ignore selected calendar date, show all future pre-approvals
       list = list.filter(v =>
         v.purpose === 'Pre-Approved Guest' &&
@@ -136,10 +143,10 @@ export class VisitCalendarComponent implements OnInit, OnChanges {
         this.toLocalIsoDate(this.getVisitorDate(v)) >= today
       );
     } else if (this.selectedTab === 'walk-in') {
-      // Only selected date & not pre-approved
+      // Show ALL pending walk-ins (urgent) + non-pending walk-ins for the selected date
       list = list.filter(v =>
-        this.toLocalIsoDate(this.getVisitorDate(v)) === selected &&
-        v.purpose !== 'Pre-Approved Guest'
+        v.purpose !== 'Pre-Approved Guest' &&
+        (v.status === 'pending' || this.toLocalIsoDate(this.getVisitorDate(v)) === selected)
       );
     } else if (this.selectedTab === 'pre-approved') {
       // Only selected date & pre-approved
@@ -149,7 +156,11 @@ export class VisitCalendarComponent implements OnInit, OnChanges {
       );
     }
 
-    this.filteredVisitors = list.sort((a, b) => this.getVisitorDate(b).getTime() - this.getVisitorDate(a).getTime());
+    this.filteredVisitors = list.sort((a, b) => {
+      if (a.status === 'pending' && b.status !== 'pending') return -1;
+      if (b.status === 'pending' && a.status !== 'pending') return 1;
+      return this.getVisitorDate(b).getTime() - this.getVisitorDate(a).getTime();
+    });
   }
 
 

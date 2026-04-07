@@ -1,6 +1,6 @@
 <ion-app>
   <!-- SPLASH SCREEN -->
-  <div *ngIf="showSplash" class="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-white">
+  <div *ngIf="showSplash" class="fixed inset-0 z-[1000] flex flex-col items-center justify-center bg-white">
     <div class="relative flex h-48 w-48 items-center justify-center">
       <img src="assets/animation.svg" class="h-full w-full object-contain" alt="Loading MyHabitat..." />
     </div>
@@ -95,7 +95,20 @@
   <!-- MAIN CONTENT (FIXED 🔥) -->
   <ion-router-outlet id="main-content"></ion-router-outlet>
 
-  <!-- SAFE AREA (OPTIONAL) -->
-  <!-- <div [style.height]="'env(safe-area-inset-bottom, 0px)'" class="fixed bottom-0 z-[999] w-full bg-primary"></div> -->
+  <!-- CUSTOM TOAST DIV 🔥 -->
+  <div *ngIf="toast$ | async as toast"
+    class="fixed bottom-10 left-1/2 z-[999999] -translate-x-1/2 transform transition-all duration-300 pointer-events-none"
+    [class.opacity-0]="!toast.show" [class.translate-y-10]="!toast.show" [class.opacity-100]="toast.show"
+    [class.translate-y-0]="toast.show">
+    <div class="flex min-w-[280px] items-center justify-center rounded-2xl px-6 py-4 shadow-2xl backdrop-blur-md"
+      [ngClass]="{
+        'bg-emerald-500/95 text-white': toast.color === 'success',
+        'bg-rose-500/95 text-white': toast.color === 'danger',
+        'bg-amber-500/95 text-white': toast.color === 'warning',
+        'bg-slate-800/90 text-white': toast.color === 'info'
+      }">
+      <span class="text-sm font-bold tracking-wide">{{ toast.message }}</span>
+    </div>
+  </div>
 
 </ion-app>

@@ -18,7 +18,19 @@ export interface AppNotification {
 export class NotificationService {
     private notifications: AppNotification[] = [];
     private notifications$ = new BehaviorSubject<AppNotification[]>([]);
+
+    // Custom Toast Subject
+    private _toast$ = new BehaviorSubject<{ message: string; color: string; show: boolean }>({ message: '', color: 'success', show: false });
+    public toast$ = this._toast$.asObservable();
+
     private authService = inject(AuthService);
+
+    showToast(message: string, color: 'success' | 'danger' | 'warning' | 'info' = 'success', duration = 10000) {
+        this._toast$.next({ message, color, show: true });
+        setTimeout(() => {
+            this._toast$.next({ message, color, show: false });
+        }, duration);
+    }
 
     constructor() {
         this.loadFromStorage();

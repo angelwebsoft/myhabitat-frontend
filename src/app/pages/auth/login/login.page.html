@@ -66,16 +66,6 @@
                             </ion-list>
                         </div>
 
-                        <div class="mb-5 text-left" *ngIf="!otpSent">
-                            <ion-label class="mb-2 ml-1 block text-[13px] font-semibold text-slate-500">Role</ion-label>
-                            <app-common-select lines="none" iconName="people" iconClass="text-[20px] mr-4 text-primary"
-                                [options]="[
-                  { label: 'Gatekeeper', value: 'gatekeeper' },
-                  { label: 'Resident', value: 'resident' },
-                  { label: 'Admin', value: 'admin' }
-                ]" [(ngModel)]="role" customClass="bg-indigo-50">
-                            </app-common-select>
-                        </div>
 
                         <div class="mt-5 pt-5 text-left" *ngIf="otpSent">
                             <div
@@ -106,7 +96,7 @@
                     </div>
                 </div>
 
-                <p class="mt-4 text-center text-[12px] text-slate-400">Use your registered number and role to continue.
+                <p class="mt-4 text-center text-[12px] text-slate-400">Use your registered mobile number to continue.
                 </p>
             </div>
         </div>

@@ -30,14 +30,14 @@
     </button>
     <div *ngIf="filteredUsers.length" class="space-y-4">
       <div *ngFor="let user of filteredUsers" class="animate__animated animate__fadeInUp" (click)="viewDetails(user)">
-        <app-common-card customClass="m-0 border-0 shadow-lg rounded-[24px] overflow-hidden p-0 relative bg-white">
-          <div class="p-5">
+        <app-common-card customClass="m-0 border-0 shadow-lg rounded-[24px] overflow-hidden !p-0 relative bg-white">
+          <div class="p-4">
             <!-- Top Section: Avatar and Name/Badge -->
             <div class="flex items-start gap-4">
               <div class="relative">
                 <ion-avatar
                   class="h-[64px] w-[64px] shrink-0 bg-slate-50 rounded-[20px] border-2 border-slate-50 shadow-sm">
-                  <img class="h-full rounded-[20px] object-cover"
+                  <img class="h-full rounded-[8px] object-cover"
                     [src]="user.photoURL || 'https://ionicframework.com/docs/img/demos/avatar.svg'" />
                 </ion-avatar>
                 <!-- Resident Type Badge Overlay -->
@@ -161,60 +161,61 @@
 
   <ion-modal [isOpen]="isEditModalOpen" (didDismiss)="isEditModalOpen = false" class="custom-sheet-modal"
     [breakpoints]="[0, 0.9, 1]" [initialBreakpoint]="0.9">
-    <ng-template>
-      <div class="px-5 py-6 bg-white flex items-center justify-between border-b border-slate-50">
-        <h2 class="m-0 text-[18px] font-black text-slate-900 uppercase tracking-widest">Edit User</h2>
-        <ion-icon name="close-circle" class="text-3xl text-slate-300 cursor-pointer"
-          (click)="isEditModalOpen = false"></ion-icon>
+    <ion-header class="ion-no-border">
+      <div class="px-4 py-3 flex items-center justify-between bg-white border-b border-slate-50">
+        <h2 class="m-0 text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">Resident Management</h2>
+        <ion-button fill="clear" color="danger" (click)="isEditModalOpen = false" class="m-0 h-8 w-8">
+          <ion-icon name="close-circle" slot="icon-only"></ion-icon>
+        </ion-button>
       </div>
-      <ion-content class="ion-padding" color="light">
-        <app-common-card customClass="m-0 p-6 space-y-5 rounded-[28px] border-0 shadow-sm">
-          <app-common-input [(ngModel)]="editingUser.userName" label="Full Name" placeholder="Enter name"
-            iconName="person">
-          </app-common-input>
+    </ion-header>
+    <ion-content class="ion-padding" color="light">
+      <app-common-card customClass="m-0 p-6 space-y-5 rounded-[28px] border-0 shadow-sm">
+        <app-common-input [(ngModel)]="editingUser.userName" label="Full Name" placeholder="Enter name"
+          iconName="person">
+        </app-common-input>
 
-          <app-common-input [(ngModel)]="editingUser.mobileNumber" label="Mobile Number" placeholder="Enter mobile"
-            iconName="call" type="tel">
-          </app-common-input>
+        <app-common-input [(ngModel)]="editingUser.mobileNumber" label="Mobile Number" placeholder="Enter mobile"
+          iconName="call" type="tel">
+        </app-common-input>
 
-          <app-common-input *ngIf="viewRole === 'resident'" [(ngModel)]="editingUser.flatNumber" label="Flat Number"
-            placeholder="Enter flat" iconName="home">
-          </app-common-input>
+        <app-common-input *ngIf="viewRole === 'resident'" [(ngModel)]="editingUser.flatNumber" label="Flat Number"
+          placeholder="Enter flat" iconName="home">
+        </app-common-input>
 
-          <app-common-input [(ngModel)]="editingUser.vehicleNumber" label="Vehicle Number" placeholder="Enter vehicle"
-            iconName="car-sport">
-          </app-common-input>
+        <app-common-input [(ngModel)]="editingUser.vehicleNumber" label="Vehicle Number" placeholder="Enter vehicle"
+          iconName="car-sport">
+        </app-common-input>
 
-          <div *ngIf="editingUser.role === 'resident'" class="flex flex-col gap-2">
-            <label class="text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">Resident Type</label>
-            <div class="relative group">
-              <select [(ngModel)]="editingUser.residentType"
-                class="w-full h-[54px] pl-4 pr-10 bg-slate-50 border-2 border-slate-50 rounded-2xl text-[15px] font-bold text-slate-700 appearance-none focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 transition-all outline-none">
-                <option value="owner">👑 Owner</option>
-                <option value="tenant">🏠 Tenant</option>
-              </select>
-              <ion-icon name="chevron-down-outline"
-                class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-lg"></ion-icon>
-            </div>
+        <div *ngIf="editingUser.role === 'resident'" class="flex flex-col gap-2">
+          <label class="text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">Resident Type</label>
+          <div class="relative group">
+            <select [(ngModel)]="editingUser.residentType"
+              class="w-full h-[54px] pl-4 pr-10 bg-slate-50 border-2 border-slate-50 rounded-2xl text-[15px] font-bold text-slate-700 appearance-none focus:bg-white focus:border-primary/20 focus:ring-4 focus:ring-primary/5 transition-all outline-none">
+              <option value="owner">👑 Owner</option>
+              <option value="tenant">🏠 Tenant</option>
+            </select>
+            <ion-icon name="chevron-down-outline"
+              class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-lg"></ion-icon>
           </div>
+        </div>
 
-          <div class="flex flex-col gap-2">
-            <label class="text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">Profile Photo</label>
-            <div
-              class="h-24 w-24 rounded-3xl bg-primary-20 flex items-center justify-center cursor-pointer overflow-hidden border-2 border-dashed border-primary-40"
-              (click)="takePhoto(false)">
-              <img *ngIf="editingUser.photoURL" [src]="editingUser.photoURL" class="h-full w-full object-cover" />
-              <ion-icon *ngIf="!editingUser.photoURL" name="camera" class="text-3xl text-primary"></ion-icon>
-            </div>
+        <div class="flex flex-col gap-2">
+          <label class="text-[12px] font-black text-slate-400 uppercase tracking-widest ml-1">Profile Photo</label>
+          <div
+            class="h-24 w-24 rounded-3xl bg-primary-20 flex items-center justify-center cursor-pointer overflow-hidden border-2 border-dashed border-primary-40"
+            (click)="takePhoto(false)">
+            <img *ngIf="editingUser.photoURL" [src]="editingUser.photoURL" class="h-full w-full object-cover" />
+            <ion-icon *ngIf="!editingUser.photoURL" name="camera" class="text-3xl text-primary"></ion-icon>
           </div>
+        </div>
 
-          <ion-button expand="block" shape="round" class="h-12 font-semibold [--box-shadow:none]" (click)="saveEdit()">
-            Save Changes
-          </ion-button>
-        </app-common-card>
+        <ion-button expand="block" shape="round" class="h-12 font-semibold [--box-shadow:none]" (click)="saveEdit()">
+          Save Changes
+        </ion-button>
+      </app-common-card>
 
-      </ion-content>
-    </ng-template>
+    </ion-content>
   </ion-modal>
 
   <ion-modal [isOpen]="isDetailsModalOpen" (didDismiss)="isDetailsModalOpen = false" [breakpoints]="[0, 0.9, 1]"
@@ -231,27 +232,57 @@
       </ion-header>
 
       <ion-content class="ion-padding" color="light">
-        <div *ngIf="selectedUser" class="flex flex-col items-center">
-          <!-- Profile Section -->
-          <div class="mb-6 mt-4 h-28 w-28 rounded-[32px] bg-indigo-50 overflow-hidden shadow-xl border-4 border-white">
-            <img *ngIf="selectedUser.photoURL" [src]="selectedUser.photoURL" class="h-full w-full object-cover" />
-            <div *ngIf="!selectedUser.photoURL" class="h-full w-full flex items-center justify-center">
-              <ion-icon name="person" class="text-4xl text-indigo-400"></ion-icon>
+        <div *ngIf="selectedUser" class="w-full flex flex-col gap-6">
+          <!-- Premium Hero Banner -->
+          <div
+            class="px-5 pt-10 pb-8 flex items-center gap-6 relative overflow-hidden bg-primary shadow-[0_8px_30px_rgba(0,0,0,0.12)] primary-gradient">
+
+            <!-- Decorative light shapes -->
+            <div class="absolute -top-12 -right-12 h-32 w-32 rounded-full bg-white/10 blur-2xl"></div>
+            <div class="absolute top-1/2 left-0 h-20 w-20 rounded-full bg-white/5 blur-xl -translate-y-1/2"></div>
+
+            <div class="relative z-10">
+              <div
+                class="h-24 w-24 rounded-[12px] bg-white/20 backdrop-blur-md overflow-hidden shadow-2xl border-[3px] border-white/50 ring-1 ring-white/10">
+                <img *ngIf="selectedUser.photoURL" [src]="selectedUser.photoURL" class="h-full w-full object-cover" />
+                <div *ngIf="!selectedUser.photoURL" class="h-full w-full flex items-center justify-center bg-white/10">
+                  <ion-icon name="person" class="text-4xl text-white/80"></ion-icon>
+                </div>
+              </div>
+              <div
+                class="absolute -bottom-1.5 -right-1.5 h-7 w-7 rounded-full bg-white shadow-lg flex items-center justify-center border-2 border-slate-50 transition-transform active:scale-90">
+                <ion-icon name="shield-checkmark" class="text-indigo-500 text-sm"></ion-icon>
+              </div>
+            </div>
+
+            <div class="flex-1 min-w-0 glass-content relative z-10">
+              <div class="flex flex-col">
+                <h1
+                  class="m-0 text-[22px] font-black text-white leading-tight truncate uppercase tracking-tight drop-shadow-sm">
+                  {{ selectedUser.userName }}</h1>
+
+                <div class="mt-2.5 flex flex-wrap items-center gap-2">
+                  <div class="px-2.5 py-1 rounded-lg bg-white/20 backdrop-blur-md border border-white/20 shadow-sm">
+                    <p class="m-0 text-[9px] font-black text-white uppercase tracking-widest leading-none">{{
+                      selectedUser.role }}</p>
+                  </div>
+
+                  <div class="flex items-center gap-2 px-2.5 py-1 rounded-lg bg-black/10">
+                    <p
+                      class="m-0 text-[8px] font-bold text-white/90 uppercase tracking-widest leading-none tabular-nums truncate max-w-[120px]">
+                      ID: {{ selectedUser.uniqueId }}</p>
+                    <div class="h-1 w-1 rounded-full bg-white/30"></div>
+                    <p class="m-0 text-[8px] font-bold text-white/90 uppercase tracking-widest leading-none">EST. {{
+                      selectedUser.createdAt | date:'y' }}</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          <h1 class="m-0 text-xl font-black text-slate-900 text-center leading-tight mb-1">{{ selectedUser.userName }}
-          </h1>
-          <div class="flex items-center gap-2 mb-6">
-            <span
-              class="px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-indigo-100 text-indigo-600 badge-status">
-              {{ selectedUser.role }}
-            </span>
-          </div>
-
-          <div class="w-full space-y-3 pb-12 px-2">
-            <div class="bg-white rounded-[10px] p-4 shadow-sm border border-slate-100">
-              <div class="flex items-center gap-4 mb-4">
+          <div class="w-full space-y-3 pb-12 px-5 mt-[-15px] relative z-20">
+            <div class="bg-white rounded-[10px] p-4 shadow-sm border border-slate-100 flex flex-col gap-4">
+              <div class="flex items-center gap-4">
                 <div class="h-9 w-9 flex items-center justify-center rounded-xl bg-indigo-50 text-indigo-500">
                   <ion-icon name="call" class="text-lg"></ion-icon>
                 </div>
@@ -264,26 +295,35 @@
                 </div>
               </div>
 
-              <div *ngIf="selectedUser.flatNumber" class="flex items-center gap-4 mb-4">
+              <!-- Flat Number -->
+              <div *ngIf="selectedUser.flatNumber" class="flex items-center gap-4">
                 <div class="h-9 w-9 flex items-center justify-center rounded-xl bg-emerald-50 text-emerald-500">
                   <ion-icon name="home" class="text-lg"></ion-icon>
                 </div>
-                <div class="flex-1 min-w-0 flex items-center justify-between pr-2">
-                  <div>
-                    <p class="m-0 text-[10px] font-black text-slate-400 uppercase tracking-widest">Flat Number</p>
-                    <p class="m-0 text-[15px] font-bold text-slate-700 uppercase">FLAT {{ selectedUser.flatNumber }}</p>
-                  </div>
-                  <div class="text-right">
-                    <p class="m-0 text-[10px] font-black text-slate-400 uppercase tracking-widest">Type</p>
-                    <div class="flex items-center gap-1.5 justify-end">
-                      <span class="text-lg">{{ selectedUser.residentType === 'tenant' ? '🏠' : '👑' }}</span>
-                      <p class="m-0 text-[13px] font-black text-slate-700 uppercase">{{ selectedUser.residentType ||
-                        'owner' }}</p>
-                    </div>
+                <div class="flex-1 min-w-0">
+                  <p class="m-0 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Flat Number</p>
+                  <p class="m-0 text-[15px] font-black text-slate-800 uppercase tracking-tight">FLAT {{
+                    selectedUser.flatNumber }}</p>
+                </div>
+              </div>
+
+              <!-- Resident Type -->
+              <div *ngIf="selectedUser.role === 'resident'" class="flex items-center gap-4">
+                <div class="h-9 w-9 flex items-center justify-center rounded-xl bg-amber-50 text-amber-500">
+                  <ion-icon name="business" class="text-lg"></ion-icon>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="m-0 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Resident Type
+                  </p>
+                  <div class="flex items-center gap-2">
+                    <span class="text-lg leading-none">{{ selectedUser.residentType === 'tenant' ? '🏠' : '👑' }}</span>
+                    <p class="m-0 text-[15px] font-black text-slate-800 uppercase tracking-tight">{{
+                      selectedUser.residentType || 'owner' }}</p>
                   </div>
                 </div>
               </div>
 
+              <!-- Vehicle Number -->
               <div class="flex items-center gap-4" *ngIf="selectedUser.vehicleNumber">
                 <div class="h-9 w-9 flex items-center justify-center rounded-xl bg-rose-50 text-rose-500">
                   <ion-icon name="car-sport-outline" class="text-lg"></ion-icon>
@@ -296,14 +336,86 @@
               </div>
             </div>
 
-            <div class="bg-indigo-600 rounded-[10px] p-5 shadow-xl shadow-indigo-100">
-              <div
-                class="flex items-center justify-between text-white/50 text-[9px] font-black uppercase tracking-widest mb-1.5">
-                <span>Account Created</span>
-                <span>{{ selectedUser.createdAt | date:'mediumDate' }}</span>
+            <!-- Maintenance Status Section (Unified UI) -->
+            <div *ngIf="selectedUser.role === 'resident'"
+              class="w-full bg-white rounded-[10px] p-4 shadow-sm border border-slate-100 flex flex-col gap-4">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="h-9 w-9 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-500">
+                    <ion-icon name="receipt" class="text-lg"></ion-icon>
+                  </div>
+                  <div>
+                    <p class="m-0 text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
+                      Maintenance Status</p>
+                    <h4 class="m-0 text-[13px] font-black text-slate-800 leading-none uppercase">Active Plan</h4>
+                  </div>
+                </div>
+
+                <!-- Status Badge -->
+                <div *ngIf="!isLoadingMaintenance && maintenanceBills.length > 0">
+                  <div
+                    [ngClass]="maintenanceBills[0].status === 'paid' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100'"
+                    class="px-2.5 py-1 rounded-full border text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 shadow-sm">
+                    <div class="h-1.5 w-1.5 rounded-full"
+                      [ngClass]="maintenanceBills[0].status === 'paid' ? 'bg-emerald-500' : 'bg-rose-500'"></div>
+                    {{ maintenanceBills[0].status }}
+                  </div>
+                </div>
               </div>
-              <p class="m-0 text-white text-xl font-black">{{ selectedUser.uniqueId }}</p>
+
+              <!-- Main Content Area -->
+              <div class="bg-indigo-50/30 rounded-xl p-4 border border-indigo-50/50">
+                <!-- Skeleton Loading -->
+                <div *ngIf="isLoadingMaintenance" class="space-y-2">
+                  <div class="h-5 w-1/2 bg-indigo-50 animate-pulse rounded-md"></div>
+                  <div class="h-3 w-1/3 bg-indigo-50 animate-pulse rounded-md"></div>
+                </div>
+
+                <div *ngIf="!isLoadingMaintenance">
+                  <ng-container *ngIf="maintenanceBills.length > 0; else noBills">
+                    <div class="flex items-end justify-between">
+                      <div>
+                        <div class="flex items-baseline gap-1">
+                          <span class="text-[12px] font-black text-indigo-400">₹</span>
+                          <span class="text-[26px] font-black text-indigo-600 tracking-tighter leading-none">
+                            {{ maintenanceBills[0].amount }}
+                          </span>
+                        </div>
+                        <p class="m-0 mt-2 text-[10px] font-bold text-indigo-400 uppercase tracking-widest">
+                          Bill: {{ maintenanceBills[0].month }} {{ maintenanceBills[0].year }}
+                        </p>
+                      </div>
+
+                      <div class="text-right">
+                        <p
+                          class="m-0 text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">
+                          Due By</p>
+                        <p class="m-0 text-[11px] font-bold text-slate-700 leading-none uppercase">
+                          {{ maintenanceBills[0].dueDate | date:'mediumDate' }}
+                        </p>
+                      </div>
+                    </div>
+                  </ng-container>
+
+                  <ng-template #noBills>
+                    <div class="py-1 flex flex-col items-center justify-center text-center">
+                      <p class="m-0 text-[12px] font-bold text-slate-400 italic">No maintenance history found.</p>
+                      <p class="m-0 text-[8px] font-black text-slate-300 uppercase tracking-widest mt-1">Generate a bill
+                        to see details</p>
+                    </div>
+                  </ng-template>
+                </div>
+              </div>
+
+              <!-- Last Updated Timestamp -->
+              <div class="flex items-center gap-1.5 px-1" *ngIf="!isLoadingMaintenance && maintenanceBills.length > 0">
+                <ion-icon name="refresh-outline" class="text-slate-300 text-[10px]"></ion-icon>
+                <p class="m-0 text-[8px] font-bold text-slate-300 uppercase tracking-widest">
+                  Verified At {{ maintenanceBills[0].createdAt | date:'shortTime' }}
+                </p>
+              </div>
             </div>
+
           </div>
         </div>
       </ion-content>

@@ -103,10 +103,11 @@
 .admin-theme {
     --ion-color-primary: #b8c480;
     --ion-color-primary-rgb: rgba(184, 196, 128, 0.20);
+    --ion-color-primary-dark: rgba(96, 112, 23, 1);
     --ion-color-primary-light: #f8f9f2;
     --ion-color-primary-contrast: #ffffff;
 
-    --primary-gradient: linear-gradient(to right, #b8c480, #dee7b7);
+    --primary-gradient: linear-gradient(to right, var(--ion-color-primary), var(--ion-color-primary-dark));
 }
 
 /*  Gatekeeper Theme */
@@ -116,7 +117,7 @@
     --ion-color-primary-light: #fef5e7;
     --ion-color-primary-contrast: #ffffff;
 
-    --primary-gradient: linear-gradient(to right, #f59e0b, #d97706);
+    --primary-gradient: linear-gradient(to right, var(--ion-color-primary), var(--ion-color-primary-dark));
 }
 
 /*  Resident Theme */
@@ -126,7 +127,7 @@
     --ion-color-primary-light: #f3effe;
     --ion-color-primary-contrast: #ffffff;
 
-    --primary-gradient: linear-gradient(to right, #8b5cf6, #c0a8ff);
+    --primary-gradient: linear-gradient(to right, var(--ion-color-primary), var(--ion-color-primary-dark));
 }
 
 /* Tailwind + Ionic Bridge */
@@ -149,6 +150,11 @@
 .border-primary {
     border-color: var(--ion-color-primary) !important;
 }
+
+.primary-gradient {
+    background: var(--primary-gradient) !important;
+}
+
 
 /* Global Input / Select Overrides */
 ion-input,

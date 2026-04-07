@@ -78,13 +78,13 @@ export class NewVisitorPage implements OnInit {
         societyId: user.societyId,
         gatekeeperId: user.id,
         residentId: resident?.id || '',
-        status: 'checked-in',
-        checkInTime: new Date(),
+        status: 'pending',
+        checkInTime: null,
         checkOutTime: null
       });
 
       const toast = await this.toastCtrl.create({
-        message: 'Visitor successfully authorized and checked-in!',
+        message: 'Request sent to resident for approval!',
         duration: 3000,
         color: 'success',
         position: 'top'

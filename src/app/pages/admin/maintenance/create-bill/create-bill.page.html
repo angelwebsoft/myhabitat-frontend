@@ -14,7 +14,7 @@
                     <label
                         class="block text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1 mb-2">Resident</label>
                     <div class="relative group">
-                        <select [(ngModel)]="selectedResidentId"
+                        <select [(ngModel)]="selectedResidentId" (change)="onResidentChange()"
                             class="w-full h-[54px] pl-4 pr-10 bg-slate-50 border-2 border-slate-50 rounded-2xl text-[15px] font-bold text-slate-700 appearance-none focus:bg-white focus:border-indigo-500/20 focus:ring-4 focus:ring-indigo-500/5 transition-all outline-none">
                             <option value="" disabled>Select Resident</option>
                             <option *ngFor="let res of residents" [value]="res.uniqueId">

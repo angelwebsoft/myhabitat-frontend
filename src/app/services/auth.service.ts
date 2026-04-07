@@ -71,19 +71,18 @@ export class AuthService {
      */
     async sendOtp(
         mobile: string,
-        role: User['role'],
         recaptchaContainerId: string
     ): Promise<{ success: boolean; message?: string }> {
 
         try {
 
             const normalizedMobile = this.normalizeMobile(mobile);
-            const matchedUser = await this.findUserByMobileAndRole(normalizedMobile, role);
+            const matchedUser = await this.findUserByMobile(normalizedMobile);
 
             if (!matchedUser) {
                 return {
                     success: false,
-                    message: 'No user role found for this mobile number'
+                    message: 'No registered user found with this mobile number'
                 };
             }
 
@@ -122,8 +121,7 @@ export class AuthService {
      * Verify OTP
      */
     async verifyOtp(
-        otp: string,
-        role: User['role']
+        otp: string
     ): Promise<{ success: boolean; message?: string }> {
 
         if (!this.confirmationResult) {
@@ -140,18 +138,18 @@ export class AuthService {
             const result = await this.confirmationResult.confirm(otp);
             const fbUser = result.user;
             const normalizedMobile = this.normalizeMobile(fbUser.phoneNumber || '');
-            const userData = await this.findUserByMobileAndRole(normalizedMobile, role);
+            const userData = await this.findUserByMobile(normalizedMobile);
 
             if (!userData) {
                 await signOut(this.auth);
                 this.currentUser$.next(null);
                 return {
                     success: false,
-                    message: 'No user role found for this mobile number'
+                    message: 'User profile not found. Please contact admin.'
                 };
             }
 
-            this.storeRole(role);
+            this.storeRole(userData.role);
             this.currentUser$.next(userData);
 
             await this.redirectToDashboard(userData);
